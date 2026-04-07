@@ -1,0 +1,310 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model abtest {
+  id           Int       @id @default(autoincrement())
+  campaign_id  Int
+  variant_name String?   @db.VarChar(100)
+  metrics      String?   @db.LongText
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+  updated_at   DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_abtest_campaign")
+}
+
+model analytics {
+  id               Int       @id @default(autoincrement())
+  campaign_id      Int
+  channel_id       Int
+  klikime          Int?      @default(0)
+  shikime          Int?      @default(0)
+  konvertime       Int?      @default(0)
+  cmimi_per_klikim Decimal?  @default(0.00) @db.Decimal(10, 2)
+  data_matjes      DateTime? @default(now()) @db.DateTime(0)
+  created_at       DateTime? @default(now()) @db.DateTime(0)
+  updated_at       DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_analytics_campaign")
+  @@index([channel_id], map: "fk_analytics_channel")
+}
+
+model audiences {
+  id         Int       @id @default(autoincrement())
+  emertimi   String    @db.VarChar(150)
+  pershkrimi String?   @db.Text
+  mosha_min  Int?
+  mosha_max  Int?
+  gjinia     String?   @db.VarChar(20)
+  lokacioni  String?   @db.VarChar(150)
+  interesat  String?   @db.Text
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+}
+
+model budgets {
+  id              Int       @id @default(autoincrement())
+  campaign_id     Int
+  shuma_totale    Decimal?  @default(0.00) @db.Decimal(12, 2)
+  shuma_shpenzuar Decimal?  @default(0.00) @db.Decimal(12, 2)
+  shuma_mbetur    Decimal?  @default(0.00) @db.Decimal(12, 2)
+  created_at      DateTime? @default(now()) @db.DateTime(0)
+  updated_at      DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_budgets_campaign")
+}
+
+model campaignaudiences {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  audience_id Int
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@unique([campaign_id, audience_id], map: "campaign_id")
+  @@index([audience_id], map: "fk_campaignaudiences_audience")
+}
+
+model campaignchannels {
+  id              Int       @id @default(autoincrement())
+  campaign_id     Int
+  channel_id      Int
+  buxheti_alokuar Decimal?  @default(0.00) @db.Decimal(12, 2)
+  statusi         String?   @default("aktiv") @db.VarChar(50)
+  created_at      DateTime? @default(now()) @db.DateTime(0)
+  updated_at      DateTime? @default(now()) @db.DateTime(0)
+
+  @@unique([campaign_id, channel_id], map: "campaign_id")
+  @@index([channel_id], map: "fk_campaignchannels_channel")
+}
+
+model campaigns {
+  id               Int       @id @default(autoincrement())
+  emertimi         String    @db.VarChar(150)
+  pershkrimi       String?   @db.Text
+  buxheti          Decimal?  @default(0.00) @db.Decimal(12, 2)
+  data_fillimit    DateTime? @db.Date
+  data_perfundimit DateTime? @db.Date
+  statusi          String?   @default("draft") @db.VarChar(50)
+  objektivi        String?   @db.VarChar(255)
+  user_id          Int
+  created_at       DateTime? @default(now()) @db.DateTime(0)
+  updated_at       DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "fk_campaigns_user")
+}
+
+model channels {
+  id         Int       @id @default(autoincrement())
+  emertimi   String    @db.VarChar(100)
+  lloji      String    @db.VarChar(100)
+  pershkrimi String?   @db.Text
+  url        String?   @db.VarChar(255)
+  statusi    String?   @default("aktiv") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+}
+
+model contents {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  titulli     String    @db.VarChar(200)
+  lloji       String?   @db.VarChar(100)
+  permbajtja  String?   @db.Text
+  media_url   String?   @db.VarChar(255)
+  statusi     String?   @default("draft") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_contents_campaign")
+}
+
+model costmetrics {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  channel_id  Int?
+  cost        Decimal?  @default(0.00) @db.Decimal(12, 2)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_costmetrics_campaign")
+  @@index([channel_id], map: "fk_costmetrics_channel")
+}
+
+model dailysummary {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  date        DateTime  @db.Date
+  klikime     Int?      @default(0)
+  shikime     Int?      @default(0)
+  konvertime  Int?      @default(0)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_dailysummary_campaign")
+}
+
+model feedback {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  campaign_id Int?
+  comment     String?   @db.Text
+  rating      Int?
+  statusi     String?   @default("aktiv") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_feedback_campaign")
+  @@index([user_id], map: "fk_feedback_user")
+}
+
+model leads {
+  id           Int       @id @default(autoincrement())
+  campaign_id  Int
+  emri         String?   @db.VarChar(100)
+  mbiemri      String?   @db.VarChar(100)
+  email        String    @unique(map: "email") @db.VarChar(150)
+  phone_number String?   @db.VarChar(30)
+  statusi      String?   @default("new") @db.VarChar(50)
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+  updated_at   DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_leads_campaign")
+}
+
+model milestones {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  campaign_id Int?
+  description String?   @db.Text
+  due_date    DateTime? @db.Date
+  statusi     String?   @default("pending") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_milestones_campaign")
+  @@index([user_id], map: "fk_milestones_user")
+}
+
+model notifications {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  message     String?   @db.Text
+  read_status Boolean?  @default(false)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "fk_notifications_user")
+}
+
+model refreshtokens {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  token      String    @db.Text
+  expires    DateTime  @db.DateTime(0)
+  revoked    DateTime? @db.DateTime(0)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "fk_refreshtokens_user")
+}
+
+model reports {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  titulli     String    @db.VarChar(200)
+  lloji       String?   @db.VarChar(100)
+  file_path   String?   @db.VarChar(255)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_reports_campaign")
+}
+
+model roles {
+  id              Int       @id @default(autoincrement())
+  emertimi        String    @db.VarChar(100)
+  pershkrimi      String?   @db.Text
+  normalized_name String    @unique(map: "normalized_name") @db.VarChar(100)
+  created_at      DateTime? @default(now()) @db.DateTime(0)
+  updated_at      DateTime? @default(now()) @db.DateTime(0)
+}
+
+model scheduling {
+  id             Int       @id @default(autoincrement())
+  campaign_id    Int
+  content_id     Int?
+  scheduled_time DateTime? @db.DateTime(0)
+  statusi        String?   @default("pending") @db.VarChar(50)
+  created_at     DateTime? @default(now()) @db.DateTime(0)
+  updated_at     DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_scheduling_campaign")
+  @@index([content_id], map: "fk_scheduling_content")
+}
+
+model socialmediaaccounts {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  platforma  String    @db.VarChar(100)
+  username   String    @db.VarChar(100)
+  followers  Int?      @default(0)
+  statusi    String?   @default("aktiv") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "fk_socialmediaaccounts_user")
+}
+
+model userclaims {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  claim_type  String    @db.VarChar(100)
+  claim_value String?   @db.Text
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "fk_userclaims_user")
+}
+
+model userroles {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  role_id    Int
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+
+  @@unique([user_id, role_id], map: "user_id")
+  @@index([role_id], map: "fk_userroles_role")
+}
+
+model users {
+  id                  Int       @id @default(autoincrement())
+  emri                String    @db.VarChar(100)
+  mbiemri             String    @db.VarChar(100)
+  email               String    @unique(map: "email") @db.VarChar(150)
+  password_hash       String    @db.VarChar(255)
+  phone_number        String?   @db.VarChar(30)
+  email_confirmed     Boolean?  @default(false)
+  lockout_enabled     Boolean?  @default(false)
+  access_failed_count Int?      @default(0)
+  statusi             String?   @default("aktiv") @db.VarChar(50)
+  created_at          DateTime? @default(now()) @db.DateTime(0)
+  updated_at          DateTime? @default(now()) @db.DateTime(0)
+}
+
+model usertokens {
+  id             Int       @id @default(autoincrement())
+  user_id        Int
+  login_provider String    @db.VarChar(100)
+  token_name     String    @db.VarChar(100)
+  token_value    String    @db.Text
+  created_at     DateTime? @default(now()) @db.DateTime(0)
+  updated_at     DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "fk_usertokens_user")
+}

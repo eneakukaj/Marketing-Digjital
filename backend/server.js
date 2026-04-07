@@ -1,11 +1,13 @@
-const express = require("express");
+import express from 'express'
+import prisma from './database/db.js'
 
-const app = express();
+const app = express()
 
-app.get("/", (req, res) => {
-  res.send("API working 🚀");
-});
+app.get('/test', async (req, res) => {
+  const data = await prisma.users.findMany()
+  res.json(data)
+})
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
+app.listen(3000, () => {
+  console.log('Server running...')
+})
