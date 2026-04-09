@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "dev": "node src/server.js"
+  },
+
   "devDependencies": {
     "prisma": "^7.6.0"
   },
