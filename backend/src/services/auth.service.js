@@ -13,16 +13,26 @@ import {
 const MAX_FAILED_ATTEMPTS = 5;
 
 export const register = async (data) => {
+
+if (!data.emri || !data.mbiemri || !data.email || !data.password || !data.phone_number) {
+  throw new Error("All fields are required");
+}
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(data.email)) {
+  throw new Error("Invalid email format");
+}
+
+if (data.password.length < 6) {
+  throw new Error("Password must be at least 6 characters long");
+}
+
   const existing = await prisma.users.findUnique({
     where: { email: data.email },
   });
 
   if (existing) {
     throw new Error("Email already exists");
-  }
-
-  if (!data.phone_number) {
-    throw new Error("Phone number is required");
   }
 
   const hashed = await hashPassword(data.password);
