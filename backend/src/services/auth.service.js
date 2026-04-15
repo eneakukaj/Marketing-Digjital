@@ -53,6 +53,10 @@ if (data.password.length < 6) {
 };
 
 export const login = async (email, password) => {
+  
+if (!email || !password) {
+  throw new Error("Email and password are required");
+}
   const user = await prisma.users.findUnique({
     where: { email },
     include: {
