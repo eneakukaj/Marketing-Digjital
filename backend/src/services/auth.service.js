@@ -47,6 +47,21 @@ if (data.password.length < 6) {
     },
   });
 
+  const defaultRole = await prisma.roles.findUnique({
+    where: { normalized_name: "USER" },
+  });
+
+  if (!defaultRole) {
+    throw new Error("Default role USER not found");
+  }
+
+  await prisma.userroles.create({
+    data: {
+      user_id: user.id,
+      role_id: defaultRole.id,
+    },
+  });
+
   delete user.password_hash;
 
   return user;
@@ -107,6 +122,10 @@ if (!email || !password) {
 
   const roles = user.userroles.map((r) => r.role.normalized_name);
 
+  if (!roles || roles.length === 0) {
+    throw new Error("User has no roles assigned");
+  }
+
   const accessToken = generateAccessToken({
     id: user.id,
     email: user.email,
@@ -125,14 +144,13 @@ if (!email || !password) {
 
   delete user.password_hash;
 
-  return {
-    user: {
-      ...user,
-      access_failed_count: 0,
-    },
+    return {
+    user,
+    roles,
     accessToken,
     refreshToken,
   };
+  
 };
 
 export const refresh = async (token) => {
