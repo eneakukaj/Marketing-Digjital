@@ -19,9 +19,9 @@ export const authorizeRoles = (...allowedRoles) => {
         });
       }
 
-      const hasAccess = userRoles.some((role) =>
-        allowedRoles.includes(role)
-      );
+       const hasAccess = userRoles
+       .map((r) => r.toUpperCase())
+        .some((role) => allowedRoles.includes(role));
 
       if (!hasAccess) {
         return res.status(403).json({
