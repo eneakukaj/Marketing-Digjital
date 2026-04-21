@@ -326,6 +326,7 @@ model users {
   phone_number        String?   @db.VarChar(30)
   email_confirmed     Boolean?  @default(false)
   lockout_enabled     Boolean?  @default(false)
+  lockout_end         DateTime?
   access_failed_count Int?      @default(0)
   statusi             String?   @default("aktiv") @db.VarChar(50)
   created_at          DateTime? @default(now()) @db.DateTime(0)

@@ -11,6 +11,7 @@ import {
 } from "../utils/token.utils.js";
 
 const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 15;
 
 export const register = async (data) => {
 
@@ -89,25 +90,45 @@ if (!email || !password) {
     throw new Error("User is not active");
   }
 
-  if (user.lockout_enabled) {
-    throw new Error("User is locked");
+  if (user.lockout_enabled && user.lockout_end) {
+    const now=new Date();
+    if(user.lockout_end > now){
+      const minutesLeft= Math.ceil((user.lockout_end-now)/60000);
+      throw new Error(`Account is locked. Try again after ${minutesLeft} minutes.`);
+    } else{
+      await prisma.users.update({
+        where: { id: user.id },
+        data: {
+          lockout_enabled: false,
+          lockout_end: null,
+          access_failed_count: 0,
+        },
+      });
+    }
   }
 
   const isValid = await comparePassword(password, user.password_hash);
 
   if (!isValid) {
     const failedCount = user.access_failed_count + 1;
+    let isLocked = failedCount >= MAX_FAILED_ATTEMPTS;
+    let lockoutTime = null;
+
+    if (isLocked) {
+      lockoutTime = new Date(Date.now() + LOCKOUT_MINUTES * 60000);
+    }
 
     await prisma.users.update({
       where: { id: user.id },
       data: {
         access_failed_count: failedCount,
         lockout_enabled: failedCount >= MAX_FAILED_ATTEMPTS,
+        lockout_end: lockoutTime,
       },
     });
 
-    if (failedCount >= MAX_FAILED_ATTEMPTS) {
-      throw new Error("Account locked due to too many failed attempts");
+    if (isLocked) {
+      throw new Error(`Account locked due to 5 failed attempts. Locked for ${LOCKOUT_MINUTES} minutes.`);
     }
 
     throw new Error("Invalid credentials");
@@ -117,6 +138,8 @@ if (!email || !password) {
     where: { id: user.id },
     data: {
       access_failed_count: 0,
+      lockout_enabled: false,
+      lockout_end: null,
     },
   });
 
@@ -189,7 +212,8 @@ export const refresh = async (token) => {
     throw new Error("User is not active");
   }
 
-  if (user.lockout_enabled) {
+  if (user.lockout_enabled && user.lockout_end && user.lockout_end > new Date()) {
+    const minutesLeft = Math.ceil((user.lockout_end - new Date()) / 60000);
     throw new Error("User is locked");
   }
 
