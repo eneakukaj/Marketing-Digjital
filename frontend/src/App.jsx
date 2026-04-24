@@ -1,8 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-
 import { useContext } from 'react'
-
 import { AuthContext } from './context/AuthContext'
+import Navbar from './layouts/Navbar';
 
  
 
@@ -13,10 +12,10 @@ function App() {
  
 
   return (
-
+    <div className="min-h-screen bg-[#0f111a]">
+      <Navbar />
+    <main>
     <Routes>
-
-      {/* Faqja kryesore - nëse s'je i loguar të dërgon te Login */}
 
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
 
@@ -26,7 +25,7 @@ function App() {
 
         <div className="flex items-center justify-center h-screen bg-gray-100">
 
-          <h1 className="text-2xl font-bold">Këtu do të jetë Faqja e Login-it</h1>
+          <h1 className="text-2xl font-bold"></h1>
 
         </div>
 
@@ -38,15 +37,16 @@ function App() {
 
         <div className="p-10">
 
-          <h1 className="text-3xl font-bold text-blue-600">Mirësevini në Dashboard!</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Dashboard!</h1>
 
         </div>
 
       } />
 
     </Routes>
-
-  )
+    </main>
+    </div>
+  );
 
 }
 
