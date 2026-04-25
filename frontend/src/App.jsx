@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from './context/AuthContext'
 import Navbar from './layouts/Navbar';
-
+import Footer from './layouts/Footer';
  
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
   return (
     <div className="min-h-screen bg-[#0f111a]">
       <Navbar />
-    <main>
+    <main className="flex-grow">
     <Routes>
 
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
@@ -45,6 +45,7 @@ function App() {
 
     </Routes>
     </main>
+    <Footer />
     </div>
   );
 
