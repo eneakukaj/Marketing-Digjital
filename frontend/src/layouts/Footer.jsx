@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           
-          {/* Section 1: Logo & Branding */}
+          
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
               <div className="bg-indigo-600 p-2 rounded-lg border border-indigo-500/40 shadow-[0_0_10px_rgba(99,102,241,0.2)]">
@@ -18,11 +18,10 @@ const Footer = () => {
               <h2 className="text-xl font-bold tracking-tight">AdVantage</h2>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Zgjidhja juaj për menaxhimin e fushatave marketing me efikasitet dhe stil.
+              Your solution for managing marketing campaigns with efficiency and style.
             </p>
           </div>
 
-          {/* Section 2: Quick Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">Navigimi</h3>
             <ul className="space-y-4">
@@ -32,7 +31,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Section 3: Support */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">Mbështetja</h3>
             <ul className="space-y-4">
@@ -42,7 +40,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Section 4: Contact */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">Kontakti</h3>
             <p className="text-gray-400 text-sm">info@advantage.al</p>
@@ -50,10 +47,9 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-xs">
-            © {currentYear} AdVantage. Të gjitha të drejtat e rezervuara.
+            © {currentYear} AdVantage. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <span className="text-gray-500 text-xs hover:text-indigo-400 cursor-pointer transition-colors">LinkedIn</span>
