@@ -2,6 +2,16 @@ import React from 'react';
 import MarketingImg from '../utils/home-page.png';
 
 const Home = () => {
+  const reviews = [
+    { id: 1, name: "Hana B.", role: "Marketing Director", text: "AdVantage has completely transformed how we track our ROI. The real-time analytics dashboard is a game-changer for our team!" },
+    { id: 2, name: "Elena R.", role: "Business Owner", text: "Finally, a platform that combines power with simplicity. The UI is incredibly intuitive, making campaign management feel effortless." },
+    { id: 3, name: "Enea K.", role: "Digital Strategist", text: "The automated reporting feature saves us hours every week. I can't imagine running our digital strategy without AdVantage anymore." },
+    { id: 4, name: "Sarah J.", role: "Agency Lead", text: "Performance and style in one package. The data visualization tools help us explain complex trends to our clients with ease." },
+    { id: 5, name: "Vesa B.", role: "Software Engineer", text: "Top-tier security and seamless integration. It’s rare to find a marketing tool that is this robust yet so easy to deploy." },
+    { id: 6, name: "Rina M.", role: "Growth Hacker", text: "Since switching to AdVantage, our conversion rates have increased by 25% thanks to their precision targeting insights." },
+    
+  ];
+
   return (
     <div className="min-h-screen bg-[#0f111a] text-white">
       
@@ -108,6 +118,46 @@ const Home = () => {
 </div>
 
 </div>
+      
+      <section className="max-w-[1440px] mx-auto px-10 py-24 border-t border-white/5">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold uppercase tracking-tight mb-4">
+            User <span className="relative inline-block mt-2">
+              <span className="absolute -inset-3 bg-indigo-600/30 blur-2xl rounded-full"></span>
+              <span className="relative text-indigo-400 font-black">
+                REVIEWS
+              </span>
+            </span>
+          </h2>
+          <div className="h-1.5 w-24 bg-indigo-600 mx-auto rounded-full mt-6 shadow-[0_0_15px_rgba(99,102,241,0.8)]"></div>
+        </div>
+
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {reviews.map((review) => (
+            <div key={review.id} className="relative group">
+              {/* Animated Glow Backdrop */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+              
+              <div className="relative bg-[#161926] p-8 rounded-2xl border border-gray-800 hover:border-indigo-500/40 transition-all duration-300 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1 text-indigo-400 mb-5 text-sm">
+                    ★ ★ ★ ★ ★
+                  </div>
+                  <p className="text-gray-400 italic leading-relaxed mb-8">
+                    "{review.text}"
+                  </p>
+                </div>
+                
+                <div className="border-t border-gray-800/50 pt-5">
+                  <h4 className="font-bold text-white text-lg tracking-wide">{review.name}</h4>
+                  <p className="text-indigo-400 text-sm font-medium uppercase tracking-wider">{review.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* QITU I SHTONI PJEST TJERA DUHET KREJT PARA MBYLLJES TQETIJ DIV TFUNDIT */}
     </div>
   ); 
