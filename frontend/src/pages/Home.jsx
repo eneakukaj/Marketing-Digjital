@@ -57,6 +57,57 @@ const Home = () => {
         </div>
 
       </section>
+
+<div className="w-full bg-white py-10 px-8">
+  <div className="max-w-[1440px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+    
+    <div>
+      <h3 className="text-5xl md:text-6xl font-extrabold text-[#06103b]">
+        120+
+      </h3>
+      <p className="text-[#06103b]/80 text-base md:text-lg mt-3 font-medium">
+        Campaigns Managed
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-5xl md:text-6xl font-extrabold text-[#06103b]">
+        85%
+      </h3>
+      <p className="text-[#06103b]/80 text-base md:text-lg mt-3 font-medium">
+        Growth Rate
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-5xl md:text-6xl font-extrabold text-[#06103b]">
+        24/7
+      </h3>
+      <p className="text-[#06103b]/80 text-base md:text-lg mt-3 font-medium">
+        Real-Time Analytics
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-5xl md:text-6xl font-extrabold text-[#06103b]">
+        10K+
+      </h3>
+      <p className="text-[#06103b]/80 text-base md:text-lg mt-3 font-medium">
+        Leads Generated
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-5xl md:text-6xl font-extrabold text-[#06103b]">
+        50+
+      </h3>
+      <p className="text-[#06103b]/80 text-base md:text-lg mt-3 font-medium">
+        Active Clients
+      </p>
+    </div>
+</div>
+
+</div>
       {/* QITU I SHTONI PJEST TJERA DUHET KREJT PARA MBYLLJES TQETIJ DIV TFUNDIT */}
     </div>
   ); 
