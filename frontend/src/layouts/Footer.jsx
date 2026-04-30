@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import logoIcon from '../utils/logo-advantage.png';
+import logoUBTIcon from '../utils/logo-ubt.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -7,7 +7,7 @@ const Footer = () => {
   return (
     <footer className="bg-[#06103b] text-white border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-32">
           
           
           <div className="col-span-1 md:col-span-1">
@@ -23,30 +23,52 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">Navigimi</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">
+              Quick Links
+              </h3>
             <ul className="space-y-4">
-              <li><Link to="/dashboard" className="text-gray-400 hover:text-white transition-colors text-sm">Dashboard</Link></li>
-              <li><Link to="/campaigns" className="text-gray-400 hover:text-white transition-colors text-sm">Fushatat</Link></li>
-              <li><Link to="/analytics" className="text-gray-400 hover:text-white transition-colors text-sm">Analitika</Link></li>
-            </ul>
-          </div>
+              <li>
+                <a 
+                href="#statistics" 
+                className="text-gray-400 hover:text-white transition-colors text-sm">
+             Statistics
+             </a>
+            </li>
 
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">Mbështetja</h3>
-            <ul className="space-y-4">
-              <li><Link to="/faq" className="text-gray-400 hover:text-white transition-colors text-sm">Pyetje të shpeshta</Link></li>
-              <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">Privatësia</Link></li>
-              <li><Link to="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">Kushtet e përdorimit</Link></li>
-            </ul>
-          </div>
+            <li>
+           <a
+           href="#reviews"
+           className="text-gray-400 hover:text-white transition-colors text-sm">
+        Reviews
+      </a>
+    </li>
+
+           <li>
+           <a
+           href="#how-it-works"
+           className="text-gray-400 hover:text-white transition-colors text-sm">
+        How it works
+      </a>
+    </li>
+  
+  </ul>
+  </div>
 
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-6 text-indigo-400">Kontakti</h3>
             <p className="text-gray-400 text-sm">info@advantage.al</p>
             <p className="text-gray-400 text-sm mt-2">+355 6X XXX XXXX</p>
           </div>
-        </div>
+        
 
+        <div className="flex justify-center md:justify-end items-center">
+    <img
+      src={logoUBTIcon}
+      alt="UBT"
+      className="w-32 h-32 opacity-100"
+    />
+  </div>
+</div>
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-xs">
             © {currentYear} AdVantage. All rights reserved.

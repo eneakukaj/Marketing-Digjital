@@ -68,7 +68,7 @@ const Home = () => {
 
       </section>
 
-<div className="w-full bg-white py-10 px-8">
+<div id="statistics" className="w-full bg-white py-10 px-8">
   <div className="max-w-[1440px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
     
     <div>
@@ -119,7 +119,7 @@ const Home = () => {
 
 </div>
       
-      <section className="max-w-[1440px] mx-auto px-10 py-24 border-t border-white/5">
+      <section id="reviews" className="max-w-[1440px] mx-auto px-10 py-24 border-t border-white/5">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold uppercase tracking-tight mb-4">
             User <span className="relative inline-block mt-2">
@@ -136,7 +136,6 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {reviews.map((review) => (
             <div key={review.id} className="relative group">
-              {/* Animated Glow Backdrop */}
               <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
               
               <div className="relative bg-[#161926] p-8 rounded-2xl border border-gray-800 hover:border-indigo-500/40 transition-all duration-300 h-full flex flex-col justify-between">
@@ -160,7 +159,7 @@ const Home = () => {
       </section>
 
 
-<section className="bg-[#0f111a] py-28 px-10">
+<section id="how-it-works" className="bg-[#0f111a] py-28 px-10">
   <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
     
     <div>

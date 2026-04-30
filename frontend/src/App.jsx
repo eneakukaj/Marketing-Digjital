@@ -5,6 +5,7 @@ import Navbar from './layouts/Navbar';
 import Footer from './layouts/Footer';
 import Home from './pages/Home';
 import Register from './pages/Register';
+import Login from "./pages/Login";
  
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
     <Routes>
 
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<h1 className="text-white p-10">Login Page</h1>} />
+      <Route path="/login" element={<Login/>} />
       <Route path="/register" element={<Register />} />
 
     </Routes>
