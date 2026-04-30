@@ -4,6 +4,7 @@ import { AuthContext } from './context/AuthContext'
 import Navbar from './layouts/Navbar';
 import Footer from './layouts/Footer';
 import Home from './pages/Home';
+import Register from './pages/Register';
  
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
 
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<h1 className="text-white p-10">Login Page</h1>} />
+      <Route path="/register" element={<Register />} />
 
     </Routes>
     </main>
