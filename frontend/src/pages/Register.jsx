@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { registerUser } from "../services/authService";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -11,6 +13,7 @@ const Register = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
 
   const handleChange = (e) => {
     setForm({
@@ -44,19 +47,31 @@ const Register = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const validationErrors = validate();
+  
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+  setErrors({});
+  setServerError(""); 
 
-    setErrors({});
-    console.log("Register data:", form);
-  };
+  try {
+    
+    await registerUser(form); 
+    
+    
+    alert("Account created successfully!");
+    navigate("/login");
+  } catch (err) {
+   
+    setServerError(err);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#0f111a] flex items-center justify-center px-6 py-20">
@@ -68,6 +83,12 @@ const Register = () => {
         <p className="text-gray-400 text-center mb-8">
           Join AdVantage and start managing smarter campaigns.
         </p>
+
+        {serverError && (
+           <p className="bg-red-500/20 border border-red-500 text-red-400 p-3 rounded-xl text-center mb-5">
+       {serverError}
+       </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
