@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext"; 
+import { loginUser } from "../services/authService"; 
 
 const Login = () => {
+  const navigate = useNavigate(); 
+  const { login } = useContext(AuthContext); 
+
     const [form, setForm] = useState({
         email:"",
         password:"",
     });
 
     const [errors, setErrors] = useState({});
+    const [serverError, setServerError] = useState(""); 
     const [rememberMe, setRememberMe] = useState(false);
 
     useEffect(() => {
@@ -45,7 +51,7 @@ const Login = () => {
         return newErrors;
     };
 
-    const handleSubmit= (e) => {
+    const handleSubmit= async (e) => {
         e.preventDefault();
 
         const validationErrors = validate();
@@ -56,13 +62,20 @@ const Login = () => {
         }
 
         setErrors({});
+        setServerError("");
 
         if (rememberMe) {
       localStorage.setItem("rememberedEmail", form.email);
     } else {
       localStorage.removeItem("rememberedEmail");
     }
-        console.log("Login data:", form);
+        try {
+            const data = await loginUser(form.email, form.password);
+            login(data.user, data.accessToken);
+            navigate("/dashboard");
+        } catch (err) {
+            setServerError(err);
+        }
     };
 
     return (
@@ -75,6 +88,12 @@ const Login = () => {
         <p className="text-gray-400 text-center mb-8">
           Sign in to your AdVantage account.
         </p>
+
+        {serverError && (
+          <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl text-center mb-6 text-sm">
+          {serverError}
+          </div>
+       )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
