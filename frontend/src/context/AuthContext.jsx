@@ -16,11 +16,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData) => {
-    setUser(userData.user);
-    localStorage.setItem('accessToken', userData.accessToken);
-    localStorage.setItem('refreshToken', userData.refreshToken); 
-    localStorage.setItem('user', JSON.stringify(userData.user));
+const login = (userData, token) => {
+    localStorage.setItem('accessToken', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    
+    setUser(userData);
   };
 
   const logout = () => {
