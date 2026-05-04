@@ -6,6 +6,8 @@ import Footer from './layouts/Footer';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard"; 
+import ProtectedRoute from "./components/ProtectedRoute"; 
  
 
 function App() {
@@ -21,6 +23,10 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login/>} />
       <Route path="/register" element={<Register />} />
+      <Route element={<ProtectedRoute allowedRoles={['user', 'admin']} />}>
+      <Route path="/dashboard" element={<Dashboard />} />
+      </Route>
+      <Route path="/unauthorized" element={<div className="text-white text-center mt-20">Nuk keni qasje!</div>} />
 
     </Routes>
     </main>
