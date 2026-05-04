@@ -7,12 +7,14 @@ import {
 
 export const registerUser = async (req, res) => {
   try {
+    console.log("Të dhënat që po vijnë nga React:", req.body);
     const user = await register(req.body);
     res.status(201).json({
       message: "User registered successfully",
       user,
     });
   } catch (err) {
+    console.error("GABIMI NË BACKEND (Register):", err);
     res.status(500).json({ error: err.message });
   }
 };

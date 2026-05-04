@@ -32,7 +32,8 @@ const login = (userData, token) => {
 
   
   const hasRole = (roleName) => {
-    return user?.roles?.includes(roleName);
+    if (!user || !user.userroles) return false;
+    return user.userroles.some(ur => ur.role?.normalized_name === roleName);
   };
 
   return (

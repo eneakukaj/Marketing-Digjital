@@ -13,6 +13,7 @@ const Register = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
   const [serverError, setServerError] = useState("");
 
   const handleChange = (e) => {

@@ -10,9 +10,18 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
+if (allowedRoles) {
+    const hasPermission = user.userroles?.some(ur => 
+      allowedRoles.includes(ur.role?.normalized_name)
+    );
 
-  if (allowedRoles && !allowedRoles.some(role => user.roles?.includes(role))) {
-    return <Navigate to="/unauthorized" replace />;
+    if (!hasPermission) {
+      return (
+        <div className="min-h-screen bg-[#0f111a] flex items-center justify-center text-white">
+          <h1 className="text-2xl font-bold">Nuk keni qasje në këtë faqe!</h1>
+        </div>
+      );
+    }
   }
 
   return <Outlet />;

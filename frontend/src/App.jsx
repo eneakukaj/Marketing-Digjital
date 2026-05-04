@@ -23,7 +23,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login/>} />
       <Route path="/register" element={<Register />} />
-      <Route element={<ProtectedRoute allowedRoles={['user', 'admin']} />}>
+      <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
       <Route path="/dashboard" element={<Dashboard />} />
       </Route>
       <Route path="/unauthorized" element={<div className="text-white text-center mt-20">Nuk keni qasje!</div>} />
