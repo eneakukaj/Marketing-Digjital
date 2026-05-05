@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import MarketingImg from '../utils/home-page.png';
 
 const Home = () => {
@@ -39,7 +40,7 @@ const Home = () => {
           </p>
 
           <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-            <button className="relative group bg-indigo-600 text-white px-8 py-4 rounded-lg font-bold transition-all">
+            <Link to="/Register" className="relative group bg-indigo-600 text-white px-8 py-4 rounded-lg font-bold transition-all inline-block">
             
               <span className="absolute -inset-1 bg-indigo-500/40 blur-xl rounded-lg opacity-0 group-hover:opacity-100 transition duration-500"></span>
               
@@ -47,7 +48,7 @@ const Home = () => {
                 Get Started Now
               </span>
 
-            </button>
+            </Link>
           </div>
 
         </div>
