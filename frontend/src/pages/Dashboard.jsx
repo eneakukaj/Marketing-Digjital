@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-
-
+import SecurityModule from '../components/security/SecurityModule';
 
 const CampaignsModule = () => {
   const [subTab, setSubTab] = useState('Overview');
@@ -32,32 +31,6 @@ const CampaignsModule = () => {
         {subTab === 'Scheduling' && <h3 className="font-bold text-slate-800">Kalendari i Publikimeve</h3>}
         {subTab === 'Budgets' && <h3 className="font-bold text-slate-800">Menaxhimi i Buxhetit</h3>}
         {subTab === 'Milestones' && <h3 className="font-bold text-slate-800">Objektivat dhe Arritjet</h3>}
-      </div>
-    </div>
-  );
-};
-
-const SecurityModule = () => {
-  const [subTab, setSubTab] = useState('Users');
-  const subMenus = ['Users', 'Roles', 'Permissions', 'Tokens'];
-
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex border-b border-gray-200 gap-8 mb-6">
-        {subMenus.map((menu) => (
-          <button
-            key={menu}
-            onClick={() => setSubTab(menu)}
-            className={`pb-4 text-sm font-bold transition-all ${
-              subTab === menu ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            {menu}
-          </button>
-        ))}
-      </div>
-      <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 min-h-[400px]">
-        <p className="italic text-gray-500">Menaxhimi i tabelës: <b>{subTab}</b></p>
       </div>
     </div>
   );
@@ -100,8 +73,6 @@ const SettingsModule = () => {
     </div>
   );
 };
-
-
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -153,7 +124,7 @@ const Dashboard = () => {
                 activeTab === 'Settings' ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-400 hover:bg-white/5'
               }`}
             >
-              ⚙️ Settings
+              Settings
             </button>
           </div>
         </nav>
