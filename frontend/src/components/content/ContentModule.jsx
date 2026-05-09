@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import OverviewCard from "../security/OverviewCards";
 import ContentTab from "./ContentTab";
 
@@ -8,7 +8,7 @@ const ContentModule = () => {
 
   const fetchContentsData = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/manager/contents");
+      const res = await api.get("/manager/contents");
 
       if (Array.isArray(res.data)) {
         setContents(res.data);
@@ -34,7 +34,9 @@ const ContentModule = () => {
     },
     {
       title: "Published Content",
-      value: contents.filter((c) => c.statusi === "published").length.toString(),
+      value: contents
+        .filter((c) => c.statusi === "published")
+        .length.toString(),
     },
     {
       title: "Media Items",

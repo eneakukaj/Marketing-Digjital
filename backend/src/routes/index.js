@@ -5,6 +5,7 @@ import adminRoutes from "./admin.routes.js";
 import managerRoutes from "./manager.routes.js";
 import userRoutes from "./userRoutes.js";
 
+
 const router = express.Router();
 
 router.use("/auth", authRoutes);

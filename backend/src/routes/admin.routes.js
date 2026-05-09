@@ -1,6 +1,7 @@
 import express from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/authorize.middleware.js";
+import { deleteCampaignController } from "../controllers/campaign.controller.js";
 
 const router = express.Router();
 
@@ -16,9 +17,12 @@ router.post("/roles", authMiddleware, authorizeRoles("ADMIN"), (req, res) => {
   res.json("Create role");
 });
 
-router.delete("/campaigns/:id", authMiddleware, authorizeRoles("ADMIN"), (req, res) => {
-  res.json("Delete campaign");
-});
+router.delete(
+  "/campaigns/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN"),
+  deleteCampaignController
+);
 
 router.get("/reports", authMiddleware, authorizeRoles("ADMIN"), (req, res) => {
   res.json("Get all reports");
