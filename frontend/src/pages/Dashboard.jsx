@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import SecurityModule from '../components/security/SecurityModule';
+import ContentModule from '../components/content/ContentModule';
 
 const CampaignsModule = () => {
   const [subTab, setSubTab] = useState('Overview');
@@ -164,8 +165,9 @@ const Dashboard = () => {
           {activeTab === 'Campaigns' && <CampaignsModule />}
           {activeTab === 'Security' && <SecurityModule />}
           {activeTab === 'Settings' && <SettingsModule />}
+          {activeTab === 'Content' && <ContentModule />}
           
-          {!['Dashboard', 'Campaigns', 'Security', 'Settings'].includes(activeTab) && (
+          {!['Dashboard', 'Campaigns', 'Content' , 'Security', 'Settings'].includes(activeTab) && (
              <div className="bg-white rounded-[2rem] p-20 text-center border border-dashed border-gray-300">
                 <h2 className="text-xl font-bold text-gray-400 italic">Moduli {activeTab} është gati për punë.</h2>
              </div>
