@@ -26,10 +26,10 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { emri, mbiemri, statusi } = req.body;
+    const { emri, mbiemri, email, statusi } = req.body;
     const updated = await prisma.users.update({
       where: { id: parseInt(id) },
-      data: { emri, mbiemri, statusi }
+      data: { emri, mbiemri, email,  statusi }
     });
     res.json(updated);
   } catch (error) {

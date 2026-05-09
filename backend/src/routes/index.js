@@ -3,7 +3,7 @@ import express from "express";
 import authRoutes from "./auth.routes.js";
 import adminRoutes from "./admin.routes.js";
 import managerRoutes from "./manager.routes.js";
-import userRoutes from "./user.routes.js";
+import userRoutes from "./userRoutes.js";
 
 const router = express.Router();
 
