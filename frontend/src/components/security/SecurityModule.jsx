@@ -3,33 +3,47 @@ import axios from 'axios';
 import OverviewCard from './OverviewCards';
 import UsersTab from './UsersTab';
 import RolesTab from './RolesTab';
-import PermissionsTab from './PermissionsTab';
 import TokensTab from './TokensTab';
 
 const SecurityModule = () => {
   const [subTab, setSubTab] = useState('Users');
   const [users, setUsers] = useState([]);
-
+  const [roles, setRoles] = useState([]);
  
   const fetchUsersData = async () => {
-   try {
-    const res = await axios.get('http://localhost:3000/api/users');
+  try {
+    const token = localStorage.getItem('accessToken'); 
+    const res = await axios.get('http://localhost:3000/api/admin/users', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
     if (Array.isArray(res.data)) {
       setUsers(res.data);
-    } else {
-      setUsers([]);
-      console.error("API doesnt return array:", res.data);
     }
-
   } catch (err) {
     console.error("API ERROR:", err);
-    setUsers([]);
   }
 };
 
+const fetchRolesData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await axios.get('http://localhost:3000/api/admin/roles', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (Array.isArray(res.data)) {
+        setRoles(res.data);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
   useEffect(() => {
     fetchUsersData();
+    fetchRolesData();
   }, [subTab]);
 
  
@@ -37,7 +51,7 @@ const SecurityModule = () => {
     { title: "Total Users", value: users.length.toString() },
     { title: "Active Users", value: users.filter(u => u.statusi === 'aktiv').length.toString() },
     { title: "Active Tokens", value: "0",  },
-    { title: "Total Roles", value: "3",  }
+    { title: "Total Roles", value: roles.length.toString() }
   ];
 
   return (
@@ -49,7 +63,7 @@ const SecurityModule = () => {
       </div>
 
       <div className="flex border-b border-gray-200 gap-8 mb-6">
-        {['Users', 'Roles', 'Permissions', 'Tokens'].map(tab => (
+        {['Users', 'Roles', 'Tokens'].map(tab => (
           <button
             key={tab}
             onClick={() => setSubTab(tab)}
@@ -65,7 +79,6 @@ const SecurityModule = () => {
       <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 min-h-[400px]">
         {subTab === 'Users' && <UsersTab users={users} refreshUsers={fetchUsersData} />}
         {subTab === 'Roles' && <RolesTab />}
-        {subTab === 'Permissions' && <PermissionsTab />}
         {subTab === 'Tokens' && <TokensTab />}
       </div>
     </div>

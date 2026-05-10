@@ -22,7 +22,6 @@ export const authorizeRoles = (...allowedRoles) => {
         });
       }
 
-      // normalize edhe allowedRoles
       const normalizedAllowed = allowedRoles.map((r) =>
         r.toUpperCase()
       );

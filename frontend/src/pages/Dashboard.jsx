@@ -162,9 +162,6 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <button className="bg-indigo-600 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-            + New Action
-          </button>
         </header>
 
         <div className="p-10">
