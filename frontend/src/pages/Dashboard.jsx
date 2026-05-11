@@ -3,80 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import SecurityModule from "../components/security/SecurityModule";
 import CampaignModule from "../components/campaigns/CampaignModule";
 import ContentModule from "../components/content/ContentModule";
-
-const CampaignsModule = () => {
-  return <CampaignModule />;
-};
-
-const SettingsModule = () => {
-  const [notifications, setNotifications] = useState(true);
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in duration-500">
-      <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-        <h3 className="font-black italic text-slate-800 mb-6">
-          PROFILE SETTINGS
-        </h3>
-
-        <div className="space-y-4">
-          <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              Full Name
-            </label>
-            <input
-              type="text"
-              className="w-full mt-1 bg-slate-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enea..."
-            />
-          </div>
-
-          <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              Email Address
-            </label>
-            <input
-              type="email"
-              className="w-full mt-1 bg-slate-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500"
-              placeholder="enea@example.com"
-            />
-          </div>
-
-          <button className="bg-indigo-600 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition">
-            Update Profile
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-        <h3 className="font-black italic text-slate-800 mb-6">PREFERENCES</h3>
-
-        <div className="p-4 bg-slate-50 rounded-2xl flex justify-between items-center mb-4">
-          <div>
-            <p className="text-sm font-bold text-slate-600">
-              Email Notifications
-            </p>
-            <p className="text-[10px] text-slate-400">
-              Receive weekly campaign reports
-            </p>
-          </div>
-
-          <button
-            onClick={() => setNotifications(!notifications)}
-            className={`w-10 h-5 rounded-full relative transition-colors ${
-              notifications ? "bg-indigo-600" : "bg-slate-200"
-            }`}
-          >
-            <div
-              className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${
-                notifications ? "left-6" : "left-1"
-              }`}
-            ></div>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+import SettingsModule from "../components/settings/SettingsModule";
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -90,12 +17,11 @@ const Dashboard = () => {
     { id: "Analytics", label: "Analytics" },
     { id: "Budget", label: "Budget" },
   ];
-
-  return (
+    return (
     <div className="flex min-h-screen bg-[#f1f5f9] text-[#1e293b]">
       <aside className="w-64 bg-[#0f172a] text-white flex flex-col fixed h-full">
         <div className="p-8">
-          <h2 className="text-2xl font-black tracking-tighter text-white">
+          <h2 className="text-2xl font-black tracking-tighter">
             AdVantage
           </h2>
         </div>
@@ -107,7 +33,7 @@ const Dashboard = () => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                 activeTab === item.id
-                  ? "bg-indigo-600 text-white shadow-lg"
+                  ? "bg-indigo-600 text-white"
                   : "text-gray-400 hover:bg-white/5"
               }`}
             >
@@ -118,9 +44,9 @@ const Dashboard = () => {
           <div className="mt-10 pt-4 border-t border-white/5 space-y-2">
             <button
               onClick={() => setActiveTab("Security")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`w-full px-4 py-3 rounded-xl text-sm font-bold ${
                 activeTab === "Security"
-                  ? "bg-white text-indigo-900 shadow-lg"
+                  ? "bg-white text-indigo-900"
                   : "text-gray-400 hover:bg-white/5"
               }`}
             >
@@ -129,9 +55,9 @@ const Dashboard = () => {
 
             <button
               onClick={() => setActiveTab("Settings")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`w-full px-4 py-3 rounded-xl text-sm font-bold ${
                 activeTab === "Settings"
-                  ? "bg-indigo-600 text-white shadow-lg"
+                  ? "bg-indigo-600 text-white"
                   : "text-gray-400 hover:bg-white/5"
               }`}
             >
@@ -141,32 +67,27 @@ const Dashboard = () => {
         </nav>
 
         <div className="p-6 border-t border-white/5 flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold uppercase shadow-inner">
+          <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold uppercase">
             {user?.emri?.[0] || "E"}
           </div>
-
-          <div className="truncate text-xs font-bold uppercase tracking-widest text-gray-400">
-            {user?.emri || "Enea"}
+          <div className="text-xs font-bold text-gray-400">
+            {user?.emri || "User"}
           </div>
         </div>
       </aside>
 
       <main className="flex-1 ml-64 min-h-screen">
-        <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-10 py-6 sticky top-0 z-10 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-black text-slate-800 uppercase italic tracking-tight">
-              {activeTab}
-            </h1>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              Marketing & Performance
-            </p>
-          </div>
 
+        <header className="bg-white/80 backdrop-blur-md border-b px-10 py-6">
+          <h1 className="text-2xl font-black uppercase">
+            {activeTab}
+          </h1>
         </header>
 
         <div className="p-10">
+
           {activeTab === "Dashboard" && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <StatCard title="Active Campaigns" value="12" />
               <StatCard title="Total Spend" value="$33,400" />
               <StatCard title="Leads" value="1,842" />
@@ -174,24 +95,17 @@ const Dashboard = () => {
             </div>
           )}
 
-          {activeTab === "Campaigns" && <CampaignsModule />}
+          {activeTab === "Campaigns" && <CampaignModule />}
+          {activeTab === "Content" && <ContentModule />}
           {activeTab === "Security" && <SecurityModule />}
           {activeTab === "Settings" && <SettingsModule />}
-          {activeTab === "Content" && <ContentModule />}
 
-          {![
-            "Dashboard",
-            "Campaigns",
-            "Content",
-            "Security",
-            "Settings",
-          ].includes(activeTab) && (
-            <div className="bg-white rounded-[2rem] p-20 text-center border border-dashed border-gray-300">
-              <h2 className="text-xl font-bold text-gray-400 italic">
-                Moduli {activeTab} është gati për punë.
-              </h2>
+          {!["Dashboard","Campaigns","Content","Security","Settings"].includes(activeTab) && (
+            <div className="bg-white p-20 text-center rounded-2xl">
+              Module {activeTab} coming soon
             </div>
           )}
+
         </div>
       </main>
     </div>
@@ -199,11 +113,9 @@ const Dashboard = () => {
 };
 
 const StatCard = ({ title, value }) => (
-  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-      {title}
-    </p>
-    <p className="text-3xl font-black text-slate-800">{value}</p>
+  <div className="bg-white p-6 rounded-3xl border shadow-sm">
+    <p className="text-xs font-bold text-gray-400">{title}</p>
+    <p className="text-3xl font-black">{value}</p>
   </div>
 );
 

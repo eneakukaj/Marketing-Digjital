@@ -9,6 +9,7 @@ const SecurityModule = () => {
   const [subTab, setSubTab] = useState('Users');
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [tokens, setTokens] = useState([]);
  
   const fetchUsersData = async () => {
   try {
@@ -46,11 +47,42 @@ const fetchRolesData = async () => {
     fetchRolesData();
   }, [subTab]);
 
+  const fetchTokensData = async () => {
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    const res = await axios.get(
+      "http://localhost:3000/api/admin/tokens",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (Array.isArray(res.data)) {
+      setTokens(res.data);
+    }
+  } catch (err) {
+    console.error("Error tokens:", err);
+  }
+};
+
+useEffect(() => {
+  fetchUsersData();
+  fetchRolesData();
+  fetchTokensData();
+}, [subTab]);
+
+  const activeTokens = tokens.filter(
+  (t) => !t.revoked && new Date(t.expires) > new Date()
+).length;
+
  
   const stats = [
     { title: "Total Users", value: users.length.toString() },
     { title: "Active Users", value: users.filter(u => u.statusi === 'aktiv').length.toString() },
-    { title: "Active Tokens", value: "0",  },
+    { title: "Active Tokens", value: activeTokens.toString() },
     { title: "Total Roles", value: roles.length.toString() }
   ];
 

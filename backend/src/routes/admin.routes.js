@@ -18,6 +18,12 @@ import {
   deleteRoleController
 } from "../controllers/roleController.js";
 
+import {
+  getTokensController,
+  revokeTokenController,
+  deleteTokenController,
+} from "../controllers/tokensController.js";
+
 const router = express.Router();
 router.use(authMiddleware);
 router.use(authorizeRoles("ADMIN"));
@@ -34,6 +40,10 @@ router.put("/users/:id", updateUserController);
 router.delete("/users/:id", deleteUserController);
 
 router.post("/users/assign-role", changeUserRoleController);
+
+router.get("/tokens", getTokensController);
+router.put("/tokens/revoke/:id", revokeTokenController);
+router.delete("/tokens/:id", deleteTokenController);
 
 router.delete("/campaigns/:id", deleteCampaignController);
 
