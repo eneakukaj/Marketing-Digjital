@@ -5,7 +5,7 @@ export const loginUser = async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
     return response.data;
   } catch (error) {
-    throw error.response?.data?.message || 'Gabim gjatë identifikimit';
+    throw error.response?.data?.message || 'Authentication failed';
   }
 };
 
@@ -14,7 +14,7 @@ export const registerUser = async (userData) => {
     const response = await api.post('/auth/register', userData);
     return response.data;
   } catch (error) {
-    throw error.response?.data?.message || 'Regjistrimi dështoi';
+    throw error.response?.data?.error || 'Registration failed';
   }
 };
 

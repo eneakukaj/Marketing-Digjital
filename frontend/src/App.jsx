@@ -26,7 +26,7 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
       <Route path="/dashboard" element={<Dashboard />} />
       </Route>
-      <Route path="/unauthorized" element={<div className="text-white text-center mt-20">Nuk keni qasje!</div>} />
+      <Route path="/unauthorized" element={<div className="text-white text-center mt-20">Access denied!</div>} />
 
     </Routes>
     </main>
