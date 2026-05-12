@@ -3,6 +3,7 @@ import api from "../../api/axios";
 import OverviewCard from "../security/OverviewCards";
 import CampaignTab from "./CampaignTab";
 import SchedulingTab from "./SchedulingTab";
+import BudgetTab from "./BudgetTab";
 
 const CampaignModule = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -99,15 +100,11 @@ const CampaignModule = () => {
       )}
 
       {subTab === "Scheduling" && (
-  <SchedulingTab campaigns={campaigns} />
+        <SchedulingTab campaigns={campaigns} />
       )}
 
       {subTab === "Budgets" && (
-        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 min-h-[400px]">
-          <h3 className="font-bold text-slate-800">
-            Budgets
-          </h3>
-        </div>
+        <BudgetTab campaigns={campaigns} />
       )}
 
       {subTab === "Milestones" && (

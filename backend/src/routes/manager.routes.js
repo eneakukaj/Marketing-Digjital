@@ -24,6 +24,12 @@ import {
 } from "../controllers/scheduling.controller.js";
 const router = express.Router();
 
+import {
+  getBudgetsController,
+  createBudgetController,
+  updateBudgetController,
+  deleteBudgetController,
+} from "../controllers/budget.controller.js";
 
 router.get(
   "/campaigns",
@@ -92,13 +98,32 @@ router.get(
   }
 );
 
+router.get(
+  "/budgets",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  getBudgetsController
+);
+
 router.post(
   "/budgets",
   authMiddleware,
   authorizeRoles("ADMIN", "MANAGER"),
-  (req, res) => {
-    res.json("Manage budget");
-  }
+  createBudgetController
+);
+
+router.put(
+  "/budgets/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  updateBudgetController
+);
+
+router.delete(
+  "/budgets/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  deleteBudgetController
 );
 
 router.get(
