@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import OverviewCard from "../security/OverviewCards";
 import CampaignTab from "./CampaignTab";
+import SchedulingTab from "./SchedulingTab";
 
 const CampaignModule = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -98,11 +99,7 @@ const CampaignModule = () => {
       )}
 
       {subTab === "Scheduling" && (
-        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 min-h-[400px]">
-          <h3 className="font-bold text-slate-800">
-            Scheduling
-          </h3>
-        </div>
+  <SchedulingTab campaigns={campaigns} />
       )}
 
       {subTab === "Budgets" && (
