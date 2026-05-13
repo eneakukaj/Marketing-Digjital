@@ -4,6 +4,7 @@ import SecurityModule from "../components/security/SecurityModule";
 import CampaignModule from "../components/campaigns/CampaignModule";
 import ContentModule from "../components/content/ContentModule";
 import SettingsModule from "../components/settings/SettingsModule";
+import AudienceModule from "../components/audience/AudienceModule";
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const Dashboard = () => {
     { id: "Content", label: "Content" },
     { id: "Audience", label: "Audience" },
     { id: "Analytics", label: "Analytics" },
-    { id: "Budget", label: "Budget" },
+    { id: "A/B Testing", label: "A/B Testing" },
   ];
     return (
     <div className="flex min-h-screen bg-[#f1f5f9] text-[#1e293b]">
@@ -97,10 +98,11 @@ const Dashboard = () => {
 
           {activeTab === "Campaigns" && <CampaignModule />}
           {activeTab === "Content" && <ContentModule />}
+          {activeTab === "Audience" && <AudienceModule />}
           {activeTab === "Security" && <SecurityModule />}
           {activeTab === "Settings" && <SettingsModule />}
 
-          {!["Dashboard","Campaigns","Content","Security","Settings"].includes(activeTab) && (
+          {!["Dashboard","Campaigns","Content","Audience","Security","Settings"].includes(activeTab) && (
             <div className="bg-white p-20 text-center rounded-2xl">
               Module {activeTab} coming soon
             </div>
