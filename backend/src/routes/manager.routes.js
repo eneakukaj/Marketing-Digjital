@@ -31,6 +31,13 @@ import {
   deleteBudgetController,
 } from "../controllers/budget.controller.js";
 
+import {
+  getMilestonesController,
+  createMilestoneController,
+  updateMilestoneController,
+  deleteMilestoneController,
+} from "../controllers/milestone.controller.js";
+
 router.get(
   "/campaigns",
   authMiddleware,
@@ -152,6 +159,34 @@ router.delete(
   authMiddleware,
   authorizeRoles("ADMIN", "MANAGER"),
   deleteScheduleController
+);
+
+router.get(
+  "/milestones",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  getMilestonesController
+);
+
+router.post(
+  "/milestones",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  createMilestoneController
+);
+
+router.put(
+  "/milestones/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  updateMilestoneController
+);
+
+router.delete(
+  "/milestones/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "MANAGER"),
+  deleteMilestoneController
 );
 
 export default router;
