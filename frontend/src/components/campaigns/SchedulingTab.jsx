@@ -4,6 +4,7 @@ import api from "../../api/axios";
 const SchedulingTab = ({ campaigns }) => {
   const [schedules, setSchedules] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSchedule, setCurrentSchedule] = useState(null);
 
   const [formData, setFormData] = useState({
     campaign_id: "",
@@ -25,20 +26,55 @@ const SchedulingTab = ({ campaigns }) => {
     fetchSchedules();
   }, []);
 
+  const openModal = (schedule = null) => {
+  if (schedule) {
+    setCurrentSchedule(schedule);
+
+    setFormData({
+      campaign_id: schedule.campaign_id || "",
+      content_id: schedule.content_id || "",
+      scheduled_time: schedule.scheduled_time
+        ? schedule.scheduled_time.slice(0, 16)
+        : "",
+      statusi: schedule.statusi || "pending",
+    });
+  } else {
+    setCurrentSchedule(null);
+
+    setFormData({
+      campaign_id: "",
+      content_id: "",
+      scheduled_time: "",
+      statusi: "pending",
+    });
+  }
+
+  setIsModalOpen(true);
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await api.post("/manager/scheduling", {
-        campaign_id: Number(formData.campaign_id),
-        content_id: formData.content_id
-          ? Number(formData.content_id)
-          : null,
-        scheduled_time: formData.scheduled_time
-          ? new Date(formData.scheduled_time).toISOString()
-          : null,
-        statusi: formData.statusi,
-      });
+      const payload = {
+  campaign_id: Number(formData.campaign_id),
+  content_id: formData.content_id
+    ? Number(formData.content_id)
+    : null,
+  scheduled_time: formData.scheduled_time
+    ? new Date(formData.scheduled_time).toISOString()
+    : null,
+  statusi: formData.statusi,
+};
+
+if (currentSchedule) {
+  await api.put(
+    `/manager/scheduling/${currentSchedule.id}`,
+    payload
+  );
+} else {
+  await api.post("/manager/scheduling", payload);
+}
 
       setFormData({
         campaign_id: "",
@@ -85,7 +121,7 @@ const SchedulingTab = ({ campaigns }) => {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => openModal()}
           className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
         >
           Add New Schedule
@@ -121,42 +157,49 @@ const SchedulingTab = ({ campaigns }) => {
           <tbody className="divide-y divide-slate-50">
             {schedules.map((schedule) => (
               <tr
-                key={schedule.id}
-                className="group hover:bg-slate-50/50 transition-colors"
-              >
-                <td className="py-4 text-slate-700">
-                  {schedule.campaign_id}
-                </td>
+  key={schedule.id}
+  className="group hover:bg-slate-50/50 transition-colors"
+>
+  <td className="py-4 text-slate-700">
+    {schedule.campaign_id}
+  </td>
 
-                <td className="py-4 text-slate-500 text-sm">
-                  {schedule.content_id || "N/A"}
-                </td>
+  <td className="py-4 text-slate-500 text-sm">
+    {schedule.content_id || "N/A"}
+  </td>
 
-                <td className="py-4 text-slate-500 text-sm">
-                  {schedule.scheduled_time
-                    ? schedule.scheduled_time
-                        .replace("T", " ")
-                        .slice(0, 16)
-                    : "N/A"}
-                </td>
+  <td className="py-4 text-slate-500 text-sm">
+    {schedule.scheduled_time
+      ? schedule.scheduled_time
+          .replace("T", " ")
+          .slice(0, 16)
+      : "N/A"}
+  </td>
 
-                <td className="py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">
-                    {schedule.statusi}
-                  </span>
-                </td>
+  <td className="py-4">
+    <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">
+      {schedule.statusi}
+    </span>
+  </td>
 
-                <td className="py-4 text-right">
-                  <button
-                    onClick={() =>
-                      handleDelete(schedule.id)
-                    }
-                    className="text-rose-600 font-bold"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+  <td className="py-4 text-right">
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={() => openModal(schedule)}
+        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => handleDelete(schedule.id)}
+        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+      >
+        Delete
+      </button>
+    </div>
+  </td>
+</tr>
             ))}
 
             {schedules.length === 0 && (
@@ -177,7 +220,7 @@ const SchedulingTab = ({ campaigns }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-md shadow-2xl border border-slate-100">
             <h3 className="text-xl font-bold text-slate-800 mb-6">
-              Create New Schedule
+              {currentSchedule ? "Edit Schedule" : "Create New Schedule"}
             </h3>
 
             <form
@@ -262,7 +305,7 @@ const SchedulingTab = ({ campaigns }) => {
                 type="submit"
                 className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold"
               >
-                Create Schedule
+                {currentSchedule ? "Update Schedule" : "Create Schedule"}
               </button>
 
               <button

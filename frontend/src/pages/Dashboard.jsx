@@ -4,7 +4,6 @@ import SecurityModule from "../components/security/SecurityModule";
 import CampaignModule from "../components/campaigns/CampaignModule";
 import ContentModule from "../components/content/ContentModule";
 import SettingsModule from "../components/settings/SettingsModule";
-import AudienceModule from "../components/audience/AudienceModule";
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -16,12 +15,12 @@ const Dashboard = () => {
     { id: "Content", label: "Content" },
     { id: "Audience", label: "Audience" },
     { id: "Analytics", label: "Analytics" },
-    { id: "A/B Testing", label: "A/B Testing" },
+    { id: "Budget", label: "Budget" },
   ];
     return (
     <div className="flex min-h-screen bg-[#f1f5f9] text-[#1e293b]">
-      <aside className="w-64 bg-[#0f172a] text-white flex flex-col fixed h-full">
-        <div className="p-8">
+      <aside className="w-64 bg-[#0f172a] text-white flex flex-col fixed top-0 left-0 h-screen overflow-y-auto z-50">
+        <div className="p-6">
           <h2 className="text-2xl font-black tracking-tighter">
             AdVantage
           </h2>
@@ -77,7 +76,7 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      <main className="flex-1 ml-64 min-h-screen">
+      <main className="flex-1 ml-64 min-h-screen relative z-10 pb-24">
 
         <header className="bg-white/80 backdrop-blur-md border-b px-10 py-6">
           <h1 className="text-2xl font-black uppercase">
@@ -85,7 +84,7 @@ const Dashboard = () => {
           </h1>
         </header>
 
-        <div className="p-10">
+        <div className="p-8">
 
           {activeTab === "Dashboard" && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -98,11 +97,10 @@ const Dashboard = () => {
 
           {activeTab === "Campaigns" && <CampaignModule />}
           {activeTab === "Content" && <ContentModule />}
-          {activeTab === "Audience" && <AudienceModule />}
           {activeTab === "Security" && <SecurityModule />}
           {activeTab === "Settings" && <SettingsModule />}
 
-          {!["Dashboard","Campaigns","Content","Audience","Security","Settings"].includes(activeTab) && (
+          {!["Dashboard","Campaigns","Content","Security","Settings"].includes(activeTab) && (
             <div className="bg-white p-20 text-center rounded-2xl">
               Module {activeTab} coming soon
             </div>

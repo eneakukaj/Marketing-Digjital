@@ -4,6 +4,7 @@ import api from "../../api/axios";
 const MilestoneTab = ({ campaigns, user }) => {
   const [milestones, setMilestones] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentMilestone, setCurrentMilestone] = useState(null);
 
   const [formData, setFormData] = useState({
     campaign_id: "",
@@ -25,17 +26,47 @@ const MilestoneTab = ({ campaigns, user }) => {
     fetchMilestones();
   }, []);
 
+  const openModal = (milestone = null) => {
+  if (milestone) {
+    setCurrentMilestone(milestone);
+
+    setFormData({
+      campaign_id: milestone.campaign_id || "",
+      description: milestone.description || "",
+      due_date: milestone.due_date ? milestone.due_date.split("T")[0] : "",
+      statusi: milestone.statusi || "pending",
+    });
+  } else {
+    setCurrentMilestone(null);
+
+    setFormData({
+      campaign_id: "",
+      description: "",
+      due_date: "",
+      statusi: "pending",
+    });
+  }
+
+  setIsModalOpen(true);
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await api.post("/manager/milestones", {
-        user_id: user?.id,
-        campaign_id: formData.campaign_id ? Number(formData.campaign_id) : null,
-        description: formData.description,
-        due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null,
-        statusi: formData.statusi,
-      });
+      const payload = {
+  user_id: user?.id,
+  campaign_id: formData.campaign_id ? Number(formData.campaign_id) : null,
+  description: formData.description,
+  due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null,
+  statusi: formData.statusi,
+};
+
+if (currentMilestone) {
+  await api.put(`/manager/milestones/${currentMilestone.id}`, payload);
+} else {
+  await api.post("/manager/milestones", payload);
+}
 
       setFormData({
         campaign_id: "",
@@ -75,7 +106,7 @@ const MilestoneTab = ({ campaigns, user }) => {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => openModal()}
           className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
         >
           Add New Milestone
@@ -97,29 +128,42 @@ const MilestoneTab = ({ campaigns, user }) => {
           <tbody className="divide-y divide-slate-50">
             {milestones.map((milestone) => (
               <tr key={milestone.id} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="py-4 text-slate-700">
-                  {milestone.campaign_id || "N/A"}
-                </td>
-                <td className="py-4 text-slate-500 text-sm">
-                  {milestone.description || "N/A"}
-                </td>
-                <td className="py-4 text-slate-500 text-sm">
-                  {milestone.due_date ? milestone.due_date.split("T")[0] : "N/A"}
-                </td>
-                <td className="py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">
-                    {milestone.statusi || "pending"}
-                  </span>
-                </td>
-                <td className="py-4 text-right">
-                  <button
-                    onClick={() => handleDelete(milestone.id)}
-                    className="text-rose-600 font-bold"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+  <td className="py-4 text-slate-700">
+    {milestone.campaign_id || "N/A"}
+  </td>
+
+  <td className="py-4 text-slate-500 text-sm">
+    {milestone.description || "N/A"}
+  </td>
+
+  <td className="py-4 text-slate-500 text-sm">
+    {milestone.due_date ? milestone.due_date.split("T")[0] : "N/A"}
+  </td>
+
+  <td className="py-4">
+    <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">
+      {milestone.statusi || "pending"}
+    </span>
+  </td>
+
+  <td className="py-4 text-right">
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={() => openModal(milestone)}
+        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => handleDelete(milestone.id)}
+        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+      >
+        Delete
+      </button>
+    </div>
+  </td>
+</tr>
             ))}
 
             {milestones.length === 0 && (
@@ -137,7 +181,7 @@ const MilestoneTab = ({ campaigns, user }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-md shadow-2xl border border-slate-100">
             <h3 className="text-xl font-bold text-slate-800 mb-6">
-              Create New Milestone
+              {currentMilestone ? "Edit Milestone" : "Create New Milestone"}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -190,7 +234,7 @@ const MilestoneTab = ({ campaigns, user }) => {
                 type="submit"
                 className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold"
               >
-                Create Milestone
+                {currentMilestone ? "Update Milestone" : "Create Milestone"}
               </button>
 
               <button

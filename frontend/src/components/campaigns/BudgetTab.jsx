@@ -4,6 +4,7 @@ import api from "../../api/axios";
 const BudgetTab = ({ campaigns }) => {
   const [budgets, setBudgets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentBudget, setCurrentBudget] = useState(null);
 
   const [formData, setFormData] = useState({
     campaign_id: "",
@@ -25,17 +26,49 @@ const BudgetTab = ({ campaigns }) => {
     fetchBudgets();
   }, []);
 
+const openModal = (budget = null) => {
+  if (budget) {
+    setCurrentBudget(budget);
+
+    setFormData({
+      campaign_id: budget.campaign_id || "",
+      shuma_totale: budget.shuma_totale || "",
+      shuma_shpenzuar: budget.shuma_shpenzuar || "",
+      shuma_mbetur: budget.shuma_mbetur || "",
+    });
+  } else {
+    setCurrentBudget(null);
+
+    setFormData({
+      campaign_id: "",
+      shuma_totale: "",
+      shuma_shpenzuar: "",
+      shuma_mbetur: "",
+    });
+  }
+
+  setIsModalOpen(true);
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await api.post("/manager/budgets", {
-        campaign_id: Number(formData.campaign_id),
-        shuma_totale: Number(formData.shuma_totale),
-        shuma_shpenzuar: Number(formData.shuma_shpenzuar),
-        shuma_mbetur: Number(formData.shuma_mbetur),
-      });
+      const payload = {
+  campaign_id: Number(formData.campaign_id),
+  shuma_totale: Number(formData.shuma_totale),
+  shuma_shpenzuar: Number(formData.shuma_shpenzuar),
+  shuma_mbetur: Number(formData.shuma_mbetur),
+};
 
+if (currentBudget) {
+  await api.put(
+    `/manager/budgets/${currentBudget.id}`,
+    payload
+  );
+} else {
+  await api.post("/manager/budgets", payload);
+}
       setFormData({
         campaign_id: "",
         shuma_totale: "",
@@ -81,7 +114,7 @@ const BudgetTab = ({ campaigns }) => {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => openModal()}
           className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
         >
           Add New Budget
@@ -117,36 +150,43 @@ const BudgetTab = ({ campaigns }) => {
           <tbody className="divide-y divide-slate-50">
             {budgets.map((budget) => (
               <tr
-                key={budget.id}
-                className="group hover:bg-slate-50/50 transition-colors"
-              >
-                <td className="py-4 text-slate-700">
-                  {budget.campaign_id}
-                </td>
+  key={budget.id}
+  className="group hover:bg-slate-50/50 transition-colors"
+>
+  <td className="py-4 text-slate-700">
+    {budget.campaign_id}
+  </td>
 
-                <td className="py-4 text-slate-500 text-sm">
-                  {budget.shuma_totale}
-                </td>
+  <td className="py-4 text-slate-500 text-sm">
+    {budget.shuma_totale}
+  </td>
 
-                <td className="py-4 text-slate-500 text-sm">
-                  {budget.shuma_shpenzuar}
-                </td>
+  <td className="py-4 text-slate-500 text-sm">
+    {budget.shuma_shpenzuar}
+  </td>
 
-                <td className="py-4 text-slate-500 text-sm">
-                  {budget.shuma_mbetur}
-                </td>
+  <td className="py-4 text-slate-500 text-sm">
+    {budget.shuma_mbetur}
+  </td>
 
-                <td className="py-4 text-right">
-                  <button
-                    onClick={() =>
-                      handleDelete(budget.id)
-                    }
-                    className="text-rose-600 font-bold"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+  <td className="py-4 text-right">
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={() => openModal(budget)}
+        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => handleDelete(budget.id)}
+        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+      >
+        Delete
+      </button>
+    </div>
+  </td>
+</tr>
             ))}
 
             {budgets.length === 0 && (
@@ -167,7 +207,7 @@ const BudgetTab = ({ campaigns }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-md shadow-2xl border border-slate-100">
             <h3 className="text-xl font-bold text-slate-800 mb-6">
-              Create New Budget
+              {currentBudget ? "Edit Budget" : "Create New Budget"}
             </h3>
 
             <form
@@ -244,7 +284,7 @@ const BudgetTab = ({ campaigns }) => {
                 type="submit"
                 className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold"
               >
-                Create Budget
+                {currentBudget ? "Update Budget" : "Create Budget"}
               </button>
 
               <button
