@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from './context/AuthContext'
 import Navbar from './layouts/Navbar';
@@ -8,34 +8,35 @@ import Register from './pages/Register';
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard"; 
 import ProtectedRoute from "./components/ProtectedRoute"; 
- 
 
 function App() {
-
   const { user } = useContext(AuthContext);
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/dashboard');
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0f111a]">
       <Navbar />
-    <main className="flex-grow">
-    <Routes>
 
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login/>} />
-      <Route path="/register" element={<Register />} />
-      <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
-      <Route path="/dashboard" element={<Dashboard />} />
-      </Route>
-      <Route path="/unauthorized" element={<div className="text-white text-center mt-20">Access denied!</div>} />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Register />} />
+          
+          <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN', 'MANAGER']} />}>
+            <Route path="/dashboard/*" element={<Dashboard />} />
+          </Route>
+          
+          <Route path="/unauthorized" element={<div className="text-white text-center mt-20">Access denied!</div>} />
+        </Routes>
+      </main>
 
-    </Routes>
-    </main>
-    <Footer />
+      <div className={`${isDashboard ? 'pl-64' : ''} transition-all duration-300`}>
+        <Footer />
+      </div>
     </div>
   );
-
 }
 
- 
-
-export default App
+export default App;

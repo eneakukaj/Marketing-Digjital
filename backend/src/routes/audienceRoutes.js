@@ -7,7 +7,7 @@ import {
   createAudienceController,
   updateAudienceController,
   deleteAudienceController,
-} from "../controllers/audienceController.js";
+} from "../controllers/audience.controller.js";
 
 const router = express.Router();
 

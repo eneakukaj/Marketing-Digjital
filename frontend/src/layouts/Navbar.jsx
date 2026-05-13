@@ -13,8 +13,6 @@ const Navbar= () => {
     };
 
     const getDashboardLink = () => {
-        if (hasRole("ADMIN")) return "/admin";
-        if (hasRole("MANAGER")) return "/manager";
         return "/dashboard";
     };
 

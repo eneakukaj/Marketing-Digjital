@@ -29,7 +29,7 @@ const AudienceModule = () => {
       });
       setAudiences(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("GABIM GJATË MARRJES SË TË DHËNAVE:", err);
+      console.error("ERROR WHILE FETCHING DATA:", err);
     } finally {
       setLoading(false);
     }
@@ -37,42 +37,36 @@ const AudienceModule = () => {
 
   useEffect(() => { fetchAudiencesData(); }, []);
 
-  // --- KALKULIMET DINAMIKE ---
 
-  // 1. Grupet e moshave për Bar Chart
   const ageGroups = [
-    { name: '18-24', count: audiences.filter(a => a.mosha_min >= 18 && a.mosha_max <= 24).length },
-    { name: '25-34', count: audiences.filter(a => a.mosha_min >= 25 && a.mosha_max <= 34).length },
-    { name: '35-44', count: audiences.filter(a => a.mosha_min >= 35 && a.mosha_max <= 44).length },
-    { name: '45+', count: audiences.filter(a => a.mosha_min >= 45).length },
-  ];
+    { name: '18-24', count: audiences.filter(a => a.mosha_min >= 18 && a.mosha_min <= 24).length },
+    { name: '25-34', count: audiences.filter(a => a.mosha_min >= 25 && a.mosha_min <= 34).length },
+    { name: '35-44', count: audiences.filter(a => a.mosha_min >= 35 && a.mosha_min <= 44).length },
+    { name: '45+',    count: audiences.filter(a => a.mosha_min >= 45).length },
+];
 
-  // 2. Shpërndarja Gjinore për Pie Chart
-  const genderDistribution = [
-    { name: 'Mashkull', value: audiences.filter(a => a.gjinia === 'Mashkull').length },
-    { name: 'Femër', value: audiences.filter(a => a.gjinia === 'Femër').length },
-    { name: 'Të tjerë', value: audiences.filter(a => a.gjinia !== 'Mashkull' && a.gjinia !== 'Femër').length },
-  ].filter(g => g.value > 0); // Shfaq vetëm ato që kanë të dhëna
+    const genderDistribution = [
+  { name: 'Male', value: audiences.filter(a => a.gjinia === 'Male').length },
+  { name: 'Female', value: audiences.filter(a => a.gjinia === 'Female').length },
+  { name: 'Other', value: audiences.filter(a => !['Male', 'Female'].includes(a.gjinia)).length },
+];
 
-  // 3. Lokacionet Kryesore
   const topLocations = audiences.reduce((acc, curr) => {
     acc[curr.lokacioni] = (acc[curr.lokacioni] || 0) + 1;
     return acc;
   }, {});
 
-  const locationData = Object.keys(topLocations).map(loc => ({
-    name: loc,
-    count: topLocations[loc]
-  })).sort((a, b) => b.count - a.count).slice(0, 4);
+  const locationData = [...new Set(audiences.map(a => a.lokacioni))].map(loc => ({
+  name: loc || "Unknown",
+  reach: audiences.filter(a => a.lokacioni === loc).length
+})).slice(0, 5);
 
   const COLORS = ['#6366f1', '#a5b4fc', '#cbd5e1', '#1e293b'];
 
-  if (loading) return <div className="p-20 text-center font-black text-slate-300 animate-pulse">Duke u sinkronizuar...</div>;
+  if (loading) return <div className="p-20 text-center font-black text-slate-300 animate-pulse">Syncing...</div>;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      
-      {/* Cards Dinamike */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <AudienceOverviewCard title="Total Segments" value={audiences.length} />
         <AudienceOverviewCard 
@@ -82,10 +76,10 @@ const AudienceModule = () => {
           isPositive={true} 
         />
         <AudienceOverviewCard 
-          title="Gjinia Dominante" 
+          title="Dominant Gender" 
           value={genderDistribution.sort((a,b) => b.value - a.value)[0]?.name || "N/A"} 
         />
-        <AudienceOverviewCard title="Fusha Interesi" value={new Set(audiences.map(a => a.interesat)).size} />
+        <AudienceOverviewCard title="Interests Field" value={new Set(audiences.map(a => a.interesat)).size} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -97,7 +91,6 @@ const AudienceModule = () => {
         </div>
 
         <div className="lg:col-span-4 space-y-6">
-          {/* Gender Pie Chart */}
           <div className="bg-[#0f172a] rounded-[2.5rem] p-8 text-white">
             <h4 className="font-bold text-indigo-400 mb-6">Gender Distribution</h4>
             <div className="h-52">
@@ -122,7 +115,6 @@ const AudienceModule = () => {
             </div>
           </div>
 
-          {/* Age Bar Chart */}
           <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
             <h4 className="font-black text-slate-800 mb-6">Age Groups</h4>
             <div className="h-44">
