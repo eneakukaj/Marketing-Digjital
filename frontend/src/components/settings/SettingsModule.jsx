@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProfileTab from "./ProfileTab";
 import PasswordTab from "./PasswordTab";
 import LoginHistoryTab from "./LoginHistoryTab";
+import NotificationsTab from "./NotificationsTab";
+import axios from "axios";
 
 const SettingsModule = () => {
   const [tab, setTab] = useState("profile");
@@ -10,6 +12,7 @@ const SettingsModule = () => {
     { id: "profile", label: "Profile" },
     { id: "password", label: "Password" },
     { id: "history", label: "Login History" },
+    { id: "notifications", label: "Notifications" },
   ];
 
   return (
@@ -34,6 +37,7 @@ const SettingsModule = () => {
       {tab === "profile" && <ProfileTab />}
       {tab === "password" && <PasswordTab />}
       {tab === "history" && <LoginHistoryTab />}
+      {tab === "notifications" && <NotificationsTab />}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import {
   getAllTokensService,
   revokeTokenService,
   deleteTokenService,
-} from "../services/tokensService.js";
+} from "../services/tokens.service.js";
 
 export const getTokensController = async (req, res) => {
   try {
@@ -19,7 +19,6 @@ export const getTokensController = async (req, res) => {
 export const revokeTokenController = async (req, res) => {
   try {
     const { id } = req.params;
-
     const token = await revokeTokenService(id);
 
     res.status(200).json(token);

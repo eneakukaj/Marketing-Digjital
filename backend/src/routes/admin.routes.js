@@ -9,20 +9,20 @@ import {
   updateUserController,
   deleteUserController,
   changeUserRoleController
-} from "../controllers/userController.js";
+} from "../controllers/user.controller.js";
 
 import {
   getRolesController,
   createRoleController,
   updateRoleController,
   deleteRoleController
-} from "../controllers/roleController.js";
+} from "../controllers/role.controller.js";
 
 import {
   getTokensController,
   revokeTokenController,
   deleteTokenController,
-} from "../controllers/tokensController.js";
+} from "../controllers/tokens.controller.js";
 
 const router = express.Router();
 router.use(authMiddleware);

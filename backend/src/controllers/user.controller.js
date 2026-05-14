@@ -6,6 +6,7 @@ import {
   deleteUser,
   changeUserRole
 } from "../services/user.service.js";
+import { createNotification } from "../services/notification.service.js";
 
 export const getUsersController = async (req, res) => {
   try {
@@ -29,6 +30,11 @@ export const getUserByIdController = async (req, res) => {
 export const createUserController = async (req, res) => {
   try {
     const result = await createUser(req.body);
+
+    await createNotification(
+      req.user.id, 
+      `User ${result.user.emri} was created successfully.`
+    );
     
     res.status(201).json({
       message: "User created successfully",

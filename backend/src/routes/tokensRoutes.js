@@ -3,7 +3,7 @@ import {
   getTokens,
   revokeToken,
   deleteToken,
-} from "../controllers/tokensController.js";
+} from "../controllers/tokens.controller.js";
 
 const router = express.Router();
 

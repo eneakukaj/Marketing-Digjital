@@ -7,7 +7,7 @@ import {
   updateRoleController,
   deleteRoleController,
   getPermissionsController,
-} from "../controllers/roleController.js";
+} from "../controllers/role.controller.js";
 
 const router = express.Router();
 
