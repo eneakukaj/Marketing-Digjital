@@ -8,6 +8,8 @@ const UsersTab = ({ users, refreshUsers }) => {
   const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [tempPassword, setTempPassword] = useState("");
+  const [showTempModal, setShowTempModal] = useState(false);
 
   const fetchRoles = async () => {
     const token = localStorage.getItem("accessToken");
@@ -59,8 +61,11 @@ const UsersTab = ({ users, refreshUsers }) => {
       await axios.put(`http://localhost:3000/api/admin/users/${currentUser.id}`, updateData, config);
       targetUserId = currentUser.id;
     } else {
-      const res = await axios.post("http://localhost:3000/api/admin/users", { ...formData, password_hash: "default123" }, config);
-      targetUserId = res.data.id;
+      const res = await axios.post("http://localhost:3000/api/admin/users", formData, config);
+      targetUserId = res.data.user.id;
+
+      setTempPassword(res.data.temporaryPassword);
+      setShowTempModal(true);
     }
 
     if (selectedRole && targetUserId) {
@@ -169,6 +174,35 @@ const UsersTab = ({ users, refreshUsers }) => {
           </div>
         </div>
       )}
+      {showTempModal && (
+  <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+    <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl relative text-center">
+
+      <h2 className="text-xl font-bold text-emerald-600 mb-4">
+        User Created Successfully 
+      </h2>
+
+      <p className="text-sm text-slate-500 mb-2">
+        Temporary Password:
+      </p>
+
+      <div className="bg-slate-100 rounded-2xl p-4 text-lg font-bold text-slate-800 mb-6 tracking-widest">
+        {tempPassword}
+      </div>
+
+      <p className="text-xs text-slate-400 mb-6">
+        Save this password — it will not be shown again.
+      </p>
+
+      <button
+        onClick={() => setShowTempModal(false)}
+        className="w-full bg-indigo-600 text-white py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all"
+      >
+        Got it
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

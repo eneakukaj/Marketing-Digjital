@@ -1,4 +1,5 @@
 import prisma from "../../database/db.js";
+import { hashPassword } from "../utils/password.utils.js";
 
 export const getAllUsers = async () => {
   return await prisma.users.findMany({
@@ -26,12 +27,16 @@ export const getUserById = async (id) => {
 };
 
 export const createUser = async (data) => {
-  return await prisma.users.create({
+  const tempPassword = Math.random().toString(36).slice(-8);
+
+  const hashedPassword = await hashPassword(tempPassword);
+
+  const user = await prisma.users.create({
     data: {
       emri: data.emri,
       mbiemri: data.mbiemri,
       email: data.email,
-      password_hash: data.password_hash,
+      password_hash: hashedPassword,
       statusi: data.statusi || "aktiv"
     },
     include: {
@@ -42,6 +47,7 @@ export const createUser = async (data) => {
      }
     }
   });
+  return { user, temporaryPassword: tempPassword };
 };
 
 export const updateUser = async (id, data) => {

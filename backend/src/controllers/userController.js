@@ -28,11 +28,16 @@ export const getUserByIdController = async (req, res) => {
 
 export const createUserController = async (req, res) => {
   try {
-    const user = await createUser(req.body);
-    res.status(201).json(user);
+    const result = await createUser(req.body);
+    
+    res.status(201).json({
+      message: "User created successfully",
+      user: result.user,
+      temporaryPassword: result.temporaryPassword
+    });
   } catch (e) {
-    res.status(400).json({ message: "Create failed" });
-  }
+  res.status(400).json({ message: e.message });
+}
 };
 
 export const updateUserController = async (req, res) => {
