@@ -5,6 +5,7 @@ import CampaignModule from "../components/campaigns/CampaignModule";
 import ContentModule from "../components/content/ContentModule";
 import SettingsModule from "../components/settings/SettingsModule";
 import AudienceModule from "../components/audience/AudienceModule";
+import AnalyticsModule from "../components/analytics/AnalyticsModule";
 import axios from "axios";
 
 const Dashboard = () => {
@@ -193,8 +194,9 @@ const Dashboard = () => {
           {activeTab === "Audience" && <AudienceModule />}
           {activeTab === "Security" && <SecurityModule />}
           {activeTab === "Settings" && <SettingsModule />}
+          {activeTab === "Analytics" && <AnalyticsModule />}
 
-          {!["Dashboard","Campaigns","Content","Audience", "Security","Settings"].includes(activeTab) && (
+          {!["Dashboard","Campaigns","Content","Audience","Analytics","Security","Settings"].includes(activeTab) && (
             <div className="bg-white p-20 text-center rounded-2xl">
               Module {activeTab} coming soon
             </div>

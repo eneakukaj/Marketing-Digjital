@@ -3,6 +3,7 @@ import cors from "cors";
 import routes from "./routes/index.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import audienceRoutes from './routes/audienceRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use(express.json());
 app.use("/api", routes);
 app.use("/api/notifications", notificationRoutes);
 app.use('/api/audiences', audienceRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 export default app;
