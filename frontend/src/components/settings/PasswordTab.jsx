@@ -30,7 +30,7 @@ const PasswordTab = () => {
   };
 
   return (
-    <div className="relative">
+    <>
       <form onSubmit={handleChange} className="space-y-4">
       <input
         type="password"
@@ -78,7 +78,7 @@ const PasswordTab = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

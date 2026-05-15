@@ -32,12 +32,11 @@ const ProfileTab = () => {
     );
     setIsSuccessModalOpen(true);
     } catch (err) {
-      console.error(err);
     }
   };
 
   return (
-    <div className="relative">
+    <>
       <form onSubmit={handleUpdate} className="space-y-4">
       <input
         className="w-full p-3 bg-slate-50 rounded-xl"
@@ -90,7 +89,7 @@ const ProfileTab = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
