@@ -5,6 +5,8 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentCampaign, setCurrentCampaign] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const [formData, setFormData] = useState({
     emertimi: "",
@@ -15,6 +17,19 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
     statusi: "draft",
     objektivi: "",
   });
+
+  const filteredCampaigns = campaigns.filter((campaign) => {
+  const matchesSearch =
+    campaign.emertimi?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    campaign.objektivi?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    campaign.statusi?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesStatus =
+    statusFilter === "all" ||
+    campaign.statusi?.toLowerCase() === statusFilter.toLowerCase();
+
+  return matchesSearch && matchesStatus;
+});
 
   const openModal = (campaign = null) => {
     if (campaign) {
@@ -105,11 +120,48 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
         </button>
       </div>
 
+      <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-3xl p-5">
+  <div className="flex flex-col md:flex-row gap-4">
+    <div className="flex-1">
+      <label className="block text-xs font-bold text-blue-700 mb-2 uppercase tracking-wide">
+        Search Campaigns
+      </label>
+
+      <input
+        type="text"
+        placeholder="Search by name, objective or status..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full px-4 py-3 rounded-2xl bg-white border border-blue-100 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
+    </div>
+
+    <div className="md:w-56">
+      <label className="block text-xs font-bold text-blue-700 mb-2 uppercase tracking-wide">
+        Filter Status
+      </label>
+
+      <select
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="w-full px-4 py-3 rounded-2xl bg-white border border-blue-100 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        <option value="all">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="draft">Draft</option>
+        <option value="paused">Paused</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+  </div>
+</div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="text-xs text-slate-400 uppercase tracking-wider border-b border-slate-50">
               <th className="pb-4 font-semibold">Name</th>
+              <th className="pb-4 font-semibold">Objective</th>
               <th className="pb-4 font-semibold">Budget</th>
               <th className="pb-4 font-semibold">Start Date</th>
               <th className="pb-4 font-semibold">End Date</th>
@@ -119,9 +171,10 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
           </thead>
 
           <tbody className="divide-y divide-slate-50">
-            {campaigns.map((campaign) => (
+            {filteredCampaigns.map((campaign) => (
               <tr key={campaign.id} className="group hover:bg-slate-50/50 transition-colors">
                 <td className="py-4 font-medium text-slate-700">{campaign.emertimi}</td>
+                <td className="py-4 text-slate-500 text-sm">{campaign.objektivi || "N/A"}</td>
                 <td className="py-4 text-slate-500 text-sm">{campaign.buxheti || "0.00"}</td>
                 <td className="py-4 text-slate-500 text-sm">
                   {campaign.data_fillimit ? campaign.data_fillimit.split("T")[0] : "N/A"}
@@ -164,9 +217,9 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
               </tr>
             ))}
 
-            {campaigns.length === 0 && (
+            {filteredCampaigns.length === 0 && (
               <tr>
-                <td colSpan="6" className="py-10 text-center text-slate-400 text-sm">
+                <td colSpan="7" className="py-10 text-center text-slate-400 text-sm">
                   No campaigns found
                 </td>
               </tr>
@@ -210,25 +263,43 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
       )}
 
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm text-center shadow-2xl border border-slate-100">
-            <div className="text-4xl mb-4">⚠️</div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Are you sure?</h3>
-            <p className="text-slate-500 text-sm mb-8">
-              Campaign <b>{currentCampaign?.emertimi}</b> will be deleted permanently.
-            </p>
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+    <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+      <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+        Are you sure?
+      </h3>
 
-            <div className="flex gap-3">
-              <button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold">
-                Cancel
-              </button>
-              <button onClick={handleDelete} className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold">
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+        Campaign{" "}
+        <span className="font-bold text-[#475569]">
+          {currentCampaign?.emertimi}
+        </span>{" "}
+        will be deleted permanently.
+      </p>
+
+      <div className="flex gap-4">
+        <button
+          type="button"
+          onClick={() => {
+            setIsDeleteModalOpen(false);
+            setCurrentCampaign(null);
+          }}
+          className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDelete}
+          className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

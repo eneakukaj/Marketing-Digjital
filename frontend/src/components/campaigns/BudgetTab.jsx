@@ -5,6 +5,8 @@ const BudgetTab = ({ campaigns }) => {
   const [budgets, setBudgets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBudget, setCurrentBudget] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [budgetToDelete, setBudgetToDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     campaign_id: "",
@@ -87,18 +89,17 @@ if (currentBudget) {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/manager/budgets/${id}`);
-      fetchBudgets();
-    } catch (err) {
-      console.error("Delete failed", err);
-      alert(
-        err.response?.data?.message ||
-          "Failed to delete budget"
-      );
-    }
-  };
+  const handleDelete = async () => {
+  try {
+    await api.delete(`/manager/budgets/${budgetToDelete.id}`);
+    fetchBudgets();
+    setIsDeleteModalOpen(false);
+    setBudgetToDelete(null);
+  } catch (err) {
+    console.error("Delete failed", err);
+    alert(err.response?.data?.message || "Failed to delete budget");
+  }
+};
 
   return (
     <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100">
@@ -179,7 +180,10 @@ if (currentBudget) {
       </button>
 
       <button
-        onClick={() => handleDelete(budget.id)}
+        onClick={() => {
+          setBudgetToDelete(budget);
+          setIsDeleteModalOpen(true);
+        }}
         className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
       >
         Delete
@@ -300,6 +304,45 @@ if (currentBudget) {
           </div>
         </div>
       )}
+
+      {isDeleteModalOpen && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+    <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+      <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+        Are you sure?
+      </h3>
+
+      <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+        Budget for campaign{" "}
+        <span className="font-bold text-[#475569]">
+          #{budgetToDelete?.campaign_id}
+        </span>{" "}
+        will be deleted permanently.
+      </p>
+
+      <div className="flex gap-4">
+        <button
+          type="button"
+          onClick={() => {
+            setIsDeleteModalOpen(false);
+            setBudgetToDelete(null);
+          }}
+          className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDelete}
+          className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
