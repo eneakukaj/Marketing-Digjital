@@ -7,6 +7,8 @@ const RolesTab = () => {
   const [currentRole, setCurrentRole] = useState(null);
   const [formData, setFormData] = useState({ emertimi: '', pershkrimi: '' });
   const [errorMessage, setErrorMessage] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState(null);
 
   const fetchData = async () => {
     const token = localStorage.getItem('accessToken');
@@ -61,15 +63,6 @@ const handleSubmit = async (e) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const token = localStorage.getItem('accessToken');
-    const config = { headers: { Authorization: `Bearer ${token}` } };
-    try {
-      await axios.delete(`http://localhost:3000/api/admin/roles/${id}`, config);
-      fetchData();
-    } catch (err) { alert("Cannot delete role."); }
-  };
-
   return (
     <div className="overflow-x-auto">
       <div className="flex justify-between items-center mb-6">
@@ -100,7 +93,7 @@ const handleSubmit = async (e) => {
               </td>
               <td className="px-6 py-4 text-right">
                 <button onClick={() => openModal(role)} className="text-indigo-600 font-bold mr-4 text-sm hover:underline">Edit</button>
-                <button onClick={() => handleDelete(role.id)} className="text-rose-600 font-bold text-sm hover:underline">Delete</button>
+                <button onClick={() => { setRoleToDelete(role); setIsDeleteModalOpen(true);}} className="text-rose-600 font-bold text-sm hover:underline">Delete</button>
               </td>
             </tr>
           ))}
@@ -139,6 +132,50 @@ const handleSubmit = async (e) => {
                 Save Role
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+    {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+            <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+              Are you sure?
+            </h3>
+            <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+              Role <span className="font-bold text-[#475569]">{roleToDelete?.emertimi}</span> will be deleted permanently.
+            </p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setRoleToDelete(null);
+                }}
+                className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const token = localStorage.getItem('accessToken');
+                  const config = { headers: { Authorization: `Bearer ${token}` } };
+                  try {
+                    await axios.delete(`http://localhost:3000/api/admin/roles/${roleToDelete.id}`, config);
+                    await fetchData();
+                    setIsDeleteModalOpen(false);
+                    setRoleToDelete(null);
+                  } catch (err) { 
+                    console.error(err);
+                    alert("Cannot delete role."); 
+                  }
+                }}
+                className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

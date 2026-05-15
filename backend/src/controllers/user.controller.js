@@ -52,6 +52,12 @@ export const updateUserController = async (req, res) => {
     if (!id) return res.status(400).json({ message: "ID missing" });
 
     const user = await updateUser(id, req.body);
+
+    await createNotification(
+      req.user.id,
+      `User ${user.emri} ${user.mbiemri} (ID: #${id}) was updated successfully.`
+    );
+
     res.json(user);
   } catch (e) {
     res.status(400).json({ message: "Update failed" });
@@ -60,7 +66,13 @@ export const updateUserController = async (req, res) => {
 
 export const deleteUserController = async (req, res) => {
   try {
-    await deleteUser(req.params.id);
+    const { id } = req.params;
+    const deletedUser = await deleteUser(id);
+
+    await createNotification(
+      req.user.id,
+      `User ${deletedUser?.emri || ''} ${deletedUser?.mbiemri || ''} (ID: #${id}) was permanently deleted.`
+    );
     res.json({ message: "Deleted" });
   } catch (e) {
     res.status(400).json({ message: "Delete failed" });
@@ -71,6 +83,10 @@ export const changeUserRoleController = async (req, res) => {
   try {
     const { user_id, role_id } = req.body;
     const result = await changeUserRole(user_id, role_id);
+    await createNotification(
+      req.user.id,
+      `Role for User ID #${user_id} was successfully updated to Role ID #${role_id}.`
+    );
     res.json(result);
   } catch (e) {
     console.error("Role Assignment Error:", e.message);

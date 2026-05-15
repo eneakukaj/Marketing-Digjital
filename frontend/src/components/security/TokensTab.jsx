@@ -5,6 +5,10 @@ const TokensTab = () => {
   const [tokens, setTokens] = useState([]);
   const [selectedToken, setSelectedToken] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [tokenToDelete, setTokenToDelete] = useState(null);
+  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
+  const [tokenToRevoke, setTokenToRevoke] = useState(null);
 
   const fetchTokens = async () => {
     try {
@@ -43,6 +47,8 @@ const TokensTab = () => {
       );
 
       fetchTokens();
+      setIsDeleteModalOpen(false);
+      setTokenToDelete(null);
     } catch (err) {
       console.error(err);
     }
@@ -63,6 +69,8 @@ const TokensTab = () => {
       );
 
       fetchTokens();
+      setIsRevokeModalOpen(false);
+      setTokenToRevoke(null);
     } catch (err) {
       console.error(err);
     }
@@ -113,8 +121,7 @@ const TokensTab = () => {
         <tbody className="divide-y divide-slate-50">
           {tokens.map((token) => {
             const isRevoked = token.revoked;
-            const isExpired =
-              new Date(token.expires) < new Date();
+            const isExpired = new Date(token.expires) < new Date();
 
             return (
               <tr
@@ -173,7 +180,8 @@ const TokensTab = () => {
 
                   {!isRevoked && (
                     <button
-                      onClick={() => handleRevoke(token.id)}
+                      onClick={() => {setTokenToRevoke(token);
+                        setIsRevokeModalOpen(true);}}
                       className="text-amber-600 font-bold mr-4 text-sm hover:underline"
                     >
                       Revoke
@@ -181,7 +189,9 @@ const TokensTab = () => {
                   )}
 
                   <button
-                    onClick={() => handleDelete(token.id)}
+                    onClick={() => {
+                      setTokenToDelete(token);
+                      setIsDeleteModalOpen(true);}}
                     className="text-rose-600 font-bold text-sm hover:underline"
                   >
                     Delete
@@ -279,6 +289,70 @@ const TokensTab = () => {
                     : "Not revoked"}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+            <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+              Are you sure?
+            </h3>
+            <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+              Token <span className="font-bold text-[#475569]">#{tokenToDelete?.id}</span> will be deleted permanently.
+            </p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setTokenToDelete(null);
+                }}
+                className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(tokenToDelete.id)}
+                className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. MODALI I RI PER REVOKE */}
+      {isRevokeModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+            <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+              Revoke Token?
+            </h3>
+            <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+              Are you sure you want to revoke Token <span className="font-bold text-[#475569]">#{tokenToRevoke?.id}</span>? The user will be logged out.
+            </p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRevokeModalOpen(false);
+                  setTokenToRevoke(null);
+                }}
+                className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRevoke(tokenToRevoke.id)}
+                className="flex-1 bg-[#d97706] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#b45309] transition-colors shadow-md shadow-amber-100"
+              >
+                Revoke
+              </button>
             </div>
           </div>
         </div>

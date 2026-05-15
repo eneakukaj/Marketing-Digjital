@@ -10,6 +10,8 @@ const UsersTab = ({ users, refreshUsers }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [tempPassword, setTempPassword] = useState("");
   const [showTempModal, setShowTempModal] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchRoles = async () => {
     const token = localStorage.getItem("accessToken");
@@ -125,7 +127,7 @@ const UsersTab = ({ users, refreshUsers }) => {
               </td>
               <td className="px-6 py-4 text-right">
                 <button onClick={() => openModal(user)} className="text-indigo-600 font-bold mr-4 text-sm hover:underline">Edit</button>
-                <button onClick={() => { if(window.confirm("Delete?")) axios.delete(`http://localhost:3000/api/admin/users/${user.id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }).then(refreshUsers) }} className="text-rose-600 font-bold text-sm hover:underline">Delete</button>
+                <button onClick={() => { setUserToDelete(user); setIsDeleteModalOpen(true);}} className="text-rose-600 font-bold text-sm hover:underline">Delete</button>
               </td>
             </tr>
           ))}
@@ -174,6 +176,49 @@ const UsersTab = ({ users, refreshUsers }) => {
           </div>
         </div>
       )}
+
+      {isDeleteModalOpen && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+    <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+      <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+        Are you sure?
+      </h3>
+      <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+        User <span className="font-bold text-[#475569]">{userToDelete?.emri} {userToDelete?.mbiemri}</span> will be deleted permanently.
+      </p>
+      <div className="flex gap-4">
+        <button
+          type="button"
+          onClick={() => {
+            setIsDeleteModalOpen(false);
+            setUserToDelete(null);
+          }}
+          className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            axios.delete(`http://localhost:3000/api/admin/users/${userToDelete.id}`, { 
+              headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } 
+            })
+            .then(() => {
+              refreshUsers();
+              setIsDeleteModalOpen(false);
+              setUserToDelete(null);
+            })
+            .catch(err => console.error(err));
+          }}
+          className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       {showTempModal && (
   <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
     <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl relative text-center">
