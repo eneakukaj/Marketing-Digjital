@@ -6,7 +6,7 @@ const AnalyticsTab = ({ analytics, refreshAnalytics }) => {
   const [currentEntry, setCurrentEntry] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
   const [channels, setChannels] = useState([]);
- 
+  
   const [formData, setFormData] = useState({
     campaign_id: '', channel_id: '', klikime: 0, shikime: 0, konvertime: 0, cmimi_per_klikim: 0
   });
@@ -22,7 +22,7 @@ const AnalyticsTab = ({ analytics, refreshAnalytics }) => {
         setCampaigns(campRes.data);
         setChannels(chanRes.data);
       } catch (err) {
-        console.error("Gabim gjatë ngarkimit të opsioneve", err);
+        console.error("Error fetching data:", err);
       }
     };
     fetchData();
@@ -62,92 +62,122 @@ const AnalyticsTab = ({ analytics, refreshAnalytics }) => {
       refreshAnalytics();
       setIsModalOpen(false);
     } catch (err) {
-      alert("Gabim gjatë ruajtjes!");
+      alert("Error occurred while saving!");
     }
   };
 
   return (
-    <div className="bg-[#161926] rounded-[2.5rem] border border-slate-800 overflow-hidden shadow-2xl mt-10">
-      <div className="p-8 flex justify-between items-center border-b border-slate-800 bg-[#1c2132]">
-        <h3 className="text-white font-bold text-xl">Detailed Metrics Report</h3>
-       
-        <button
+    <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm mt-10">
+      <div className="p-8 flex justify-between items-center border-b border-slate-100">
+        <h3 className="text-slate-800 font-black text-xl">Detailed Metrics Report</h3>
+        <button 
           onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20"
+          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 text-sm"
         >
           + Add Analytics
         </button>
       </div>
 
-      <table className="w-full text-left">
-        <thead className="bg-slate-900/50 text-slate-500 text-[10px] uppercase font-black">
-          <tr>
-            <th className="px-8 py-4">Campaign</th>
-            <th className="px-8 py-4">Channel</th>
-            <th className="px-8 py-4 text-center">Clicks</th>
-            <th className="px-8 py-4 text-center">Conversions</th>
-            <th className="px-8 py-4 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-800">
-          {analytics.map((item) => (
-            <tr key={item.id} className="hover:bg-white/5 transition-all group">
-              <td className="px-8 py-5 text-white font-semibold">{item.campaign?.emertimi}</td>
-              <td className="px-8 py-5 text-slate-400">{item.channel?.emertimi}</td>
-              <td className="px-8 py-5 text-center text-indigo-400 font-bold">{item.klikime}</td>
-              <td className="px-8 py-5 text-center text-emerald-400 font-bold">{item.konvertime}</td>
-              <td className="px-8 py-5 text-right space-x-4">
-                <button onClick={() => openModal(item)} className="text-slate-400 hover:text-white transition-colors">Edit</button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left">
+          <thead className="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold tracking-wider">
+            <tr>
+              <th className="px-8 py-4">Campaign</th>
+              <th className="px-8 py-4">Channel</th>
+              <th className="px-8 py-4 text-center">Clicks</th>
+              <th className="px-8 py-4 text-center">Conversions</th>
+              <th className="px-8 py-4 text-right">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {analytics.map((item) => (
+              <tr key={item.id} className="hover:bg-slate-50/80 transition-all group">
+                <td className="px-8 py-5 text-slate-800 font-bold">{item.campaign?.emertimi}</td>
+                <td className="px-8 py-5 text-slate-500 font-medium">{item.channel?.emertimi}</td>
+                <td className="px-8 py-5 text-center text-indigo-600 font-extrabold">{item.klikime}</td>
+                <td className="px-8 py-5 text-center text-emerald-600 font-extrabold">{item.konvertime}</td>
+                <td className="px-8 py-5 text-right space-x-4">
+                  <button 
+                    onClick={() => openModal(item)} 
+                    className="text-slate-400 hover:text-slate-700 font-bold text-sm transition-colors"
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
-          <div className="bg-[#161926] w-full max-w-lg rounded-[3rem] p-10 border border-slate-800 shadow-2xl">
-            <h2 className="text-2xl font-black text-white mb-8">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-10 border border-slate-100 shadow-xl">
+            <h2 className="text-2xl font-black text-slate-800 mb-6">
               {currentEntry ? 'Update Analytics' : 'Add New Metrics'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <label className="text-xs font-bold text-slate-500 uppercase ml-2">Campaign</label>
-              <select
-                className="w-full bg-slate-900 border-none rounded-2xl p-4 text-white focus:ring-2 ring-indigo-500"
-                value={formData.campaign_id}
-                onChange={(e) => setFormData({...formData, campaign_id: e.target.value})}
-                required
-              >
-                <option value="">Select Campaign</option>
-                {campaigns.map(c => <option key={c.id} value={c.id}>{c.emertimi}</option>)}
-              </select>
+              
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Campaign</label>
+                <select 
+                  className="w-full bg-slate-50 border-none rounded-2xl p-4 text-slate-700 font-medium mt-1 focus:ring-2 focus:ring-indigo-500/20"
+                  value={formData.campaign_id}
+                  onChange={(e) => setFormData({...formData, campaign_id: e.target.value})}
+                  required
+                >
+                  <option value="">Select Campaign</option>
+                  {campaigns.map(c => <option key={c.id} value={c.id}>{c.emertimi}</option>)}
+                </select>
+              </div>
 
-              <label className="text-xs font-bold text-slate-500 uppercase ml-2">Channel</label>
-              <select
-                className="w-full bg-slate-900 border-none rounded-2xl p-4 text-white focus:ring-2 ring-indigo-500"
-                value={formData.channel_id}
-                onChange={(e) => setFormData({...formData, channel_id: e.target.value})}
-                required
-              >
-                <option value="">Select Channel</option>
-                {channels.map(c => <option key={c.id} value={c.id}>{c.emertimi}</option>)}
-              </select>
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Channel</label>
+                <select 
+                  className="w-full bg-slate-50 border-none rounded-2xl p-4 text-slate-700 font-medium mt-1 focus:ring-2 focus:ring-indigo-500/20"
+                  value={formData.channel_id}
+                  onChange={(e) => setFormData({...formData, channel_id: e.target.value})}
+                  required
+                >
+                  <option value="">Select Channel</option>
+                  {channels.map(c => <option key={c.id} value={c.id}>{c.emertimi}</option>)}
+                </select>
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase ml-2">Clicks</label>
-                  <input type="number" className="w-full bg-slate-900 rounded-2xl p-4 text-white mt-1" value={formData.klikime} onChange={(e) => setFormData({...formData, klikime: e.target.value})} />
+                  <label className="text-xs font-bold text-slate-400 uppercase ml-1">Clicks</label>
+                  <input 
+                    type="number" 
+                    className="w-full bg-slate-50 border-none rounded-2xl p-4 text-slate-700 font-medium mt-1" 
+                    value={formData.klikime} 
+                    onChange={(e) => setFormData({...formData, klikime: e.target.value})} 
+                  />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase ml-2">Conversions</label>
-                  <input type="number" className="w-full bg-slate-900 rounded-2xl p-4 text-white mt-1" value={formData.konvertime} onChange={(e) => setFormData({...formData, konvertime: e.target.value})} />
+                  <label className="text-xs font-bold text-slate-400 uppercase ml-1">Conversions</label>
+                  <input 
+                    type="number" 
+                    className="w-full bg-slate-50 border-none rounded-2xl p-4 text-slate-700 font-medium mt-1" 
+                    value={formData.konvertime} 
+                    onChange={(e) => setFormData({...formData, konvertime: e.target.value})} 
+                  />
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-8">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 text-slate-400 font-bold">Cancel</button>
-                <button type="submit" className="flex-1 bg-indigo-600 text-white rounded-2xl font-bold py-4 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/30">
+              <div className="flex gap-4 pt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-indigo-600 text-white rounded-2xl font-bold py-4 shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                >
                   {currentEntry ? 'Save Changes' : 'Create Entry'}
                 </button>
               </div>
