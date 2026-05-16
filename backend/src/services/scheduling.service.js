@@ -7,8 +7,8 @@ export const getAllSchedules = async () => {
 export const createSchedule = async (data) => {
   return await db.scheduling.create({
     data: {
-      campaign_id: data.campaign_id,
-      content_id: data.content_id,
+      campaign_id: Number(data.campaign_id),
+      content_id: data.content_id ? Number(data.content_id) : null,
       scheduled_time: data.scheduled_time,
       statusi: data.statusi,
     },
@@ -18,7 +18,12 @@ export const createSchedule = async (data) => {
 export const updateSchedule = async (id, data) => {
   return await db.scheduling.update({
     where: { id: Number(id) },
-    data,
+    data: {
+      campaign_id: data.campaign_id ? Number(data.campaign_id) : undefined,
+      content_id: data.content_id ? Number(data.content_id) : null,
+      scheduled_time: data.scheduled_time,
+      statusi: data.statusi,
+    },
   });
 };
 

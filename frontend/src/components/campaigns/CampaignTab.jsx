@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 
 const CampaignTab = ({ campaigns, refreshCampaigns }) => {
@@ -7,6 +7,7 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
   const [currentCampaign, setCurrentCampaign] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [channels, setChannels] = useState([]);
 
   const [formData, setFormData] = useState({
     emertimi: "",
@@ -16,7 +17,21 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
     data_perfundimit: "",
     statusi: "draft",
     objektivi: "",
+    channel_id: "",
   });
+
+  useEffect(() => {
+  const fetchChannels = async () => {
+    try {
+      const res = await api.get("/channels");
+      setChannels(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Error fetching channels:", err);
+    }
+  };
+
+  fetchChannels();
+}, []);
 
   const filteredCampaigns = campaigns.filter((campaign) => {
   const matchesSearch =
@@ -42,6 +57,7 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
         data_perfundimit: campaign.data_perfundimit ? campaign.data_perfundimit.split("T")[0] : "",
         statusi: campaign.statusi || "draft",
         objektivi: campaign.objektivi || "",
+        channel_id: campaign.campaignchannels?.[0]?.channel_id || "",
       });
     } else {
       setCurrentCampaign(null);
@@ -53,6 +69,7 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
         data_perfundimit: "",
         statusi: "draft",
         objektivi: "",
+        channel_id: "",
       });
     }
 
@@ -238,6 +255,12 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <input type="text" placeholder="Campaign Name" className="w-full bg-slate-50 rounded-2xl p-4" value={formData.emertimi} onChange={(e) => setFormData({ ...formData, emertimi: e.target.value })} required />
               <input type="text" placeholder="Objective" className="w-full bg-slate-50 rounded-2xl p-4" value={formData.objektivi} onChange={(e) => setFormData({ ...formData, objektivi: e.target.value })} />
+              <select className="w-full bg-slate-50 rounded-2xl p-4" value={formData.channel_id}onChange={(e) => setFormData({ ...formData, channel_id: e.target.value })}>
+              <option value="">Select Channel</option>{channels.map((channel) => (<option key={channel.id} value={channel.id}>
+              {channel.emertimi} {channel.lloji ? `(${channel.lloji})` : ""}
+              </option>
+              ))}
+              </select>
               <input type="number" step="0.01" placeholder="Budget" className="w-full bg-slate-50 rounded-2xl p-4" value={formData.buxheti} onChange={(e) => setFormData({ ...formData, buxheti: e.target.value })} />
               <input type="date" className="w-full bg-slate-50 rounded-2xl p-4" value={formData.data_fillimit} onChange={(e) => setFormData({ ...formData, data_fillimit: e.target.value })} />
               <input type="date" className="w-full bg-slate-50 rounded-2xl p-4" value={formData.data_perfundimit} onChange={(e) => setFormData({ ...formData, data_perfundimit: e.target.value })} />
