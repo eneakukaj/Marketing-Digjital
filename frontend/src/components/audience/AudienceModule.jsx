@@ -3,16 +3,13 @@ import axios from 'axios';
 import AudienceTab from './AudienceTab';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, Tooltip } from 'recharts';
 
-const AudienceOverviewCard = ({ title, value, percentage, isPositive }) => (
-  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
-    <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">{title}</span>
-    <div className="flex items-end justify-between">
-      <h2 className="text-3xl font-black text-slate-800">{value}</h2>
-      {percentage && (
-        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-          {isPositive ? '↑' : '↓'} {percentage}
-        </span>
-      )}
+const AudienceOverviewCard = ({ title, value }) => (
+  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+    <div>
+      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{title}</p>
+    </div>
+    <div className="text-sm font-black bg-indigo-50 text-indigo-600 h-12 px-4 flex items-center justify-center rounded-xl shrink-0 ml-4 select-none min-w-[3.5rem] whitespace-nowrap">
+      {value}
     </div>
   </div>
 );
@@ -43,13 +40,13 @@ const AudienceModule = () => {
     { name: '25-34', count: audiences.filter(a => a.mosha_min >= 25 && a.mosha_min <= 34).length },
     { name: '35-44', count: audiences.filter(a => a.mosha_min >= 35 && a.mosha_min <= 44).length },
     { name: '45+',    count: audiences.filter(a => a.mosha_min >= 45).length },
-];
+  ];
 
-    const genderDistribution = [
-  { name: 'Male', value: audiences.filter(a => a.gjinia === 'Male').length },
-  { name: 'Female', value: audiences.filter(a => a.gjinia === 'Female').length },
-  { name: 'Other', value: audiences.filter(a => !['Male', 'Female'].includes(a.gjinia)).length },
-];
+  const genderDistribution = [
+    { name: 'Male', value: audiences.filter(a => a.gjinia === 'Male').length },
+    { name: 'Female', value: audiences.filter(a => a.gjinia === 'Female').length },
+    { name: 'Other', value: audiences.filter(a => !['Male', 'Female'].includes(a.gjinia)).length },
+  ];
 
   const topLocations = audiences.reduce((acc, curr) => {
     acc[curr.lokacioni] = (acc[curr.lokacioni] || 0) + 1;
@@ -57,9 +54,9 @@ const AudienceModule = () => {
   }, {});
 
   const locationData = [...new Set(audiences.map(a => a.lokacioni))].map(loc => ({
-  name: loc || "Unknown",
-  reach: audiences.filter(a => a.lokacioni === loc).length
-})).slice(0, 5);
+    name: loc || "Unknown",
+    reach: audiences.filter(a => a.lokacioni === loc).length
+  })).slice(0, 5);
 
   const COLORS = ['#6366f1', '#a5b4fc', '#cbd5e1', '#1e293b'];
 
@@ -72,8 +69,6 @@ const AudienceModule = () => {
         <AudienceOverviewCard 
           title="Top Location" 
           value={locationData[0]?.name || "N/A"} 
-          percentage={locationData.length > 0 ? "Kryesor" : null} 
-          isPositive={true} 
         />
         <AudienceOverviewCard 
           title="Dominant Gender" 

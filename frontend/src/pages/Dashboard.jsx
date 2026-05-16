@@ -58,7 +58,7 @@ const Dashboard = () => {
     { id: "Channels", label: "Channels" },
     { id: "Audience", label: "Audience" },
     { id: "Analytics", label: "Analytics" },
-    { id: "Budget", label: "Budget" },
+    { id: "A/B Testing", label: "A/B Testing" },
   ];
     return (
     <div className="flex min-h-screen bg-[#f1f5f9] text-[#1e293b]">

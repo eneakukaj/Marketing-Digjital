@@ -79,7 +79,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
           onClick={() => openModal()} 
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
         >
-          Create Audience
+          + Add Audience
         </button>
       </div>
 
@@ -107,22 +107,22 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
                   </td>
                   <td className="p-4">{aud.lokacioni}</td>
                   <td className="p-4 text-right space-x-4">
-                  <button 
-                   onClick={() => openModal(aud)} 
-                   className="text-slate-400 font-bold transition-all duration-200 hover:text-indigo-600 active:scale-95"
-                   >
-                   Edit
-                  </button>
-                  <button 
-                  onClick={() => handleDelete(aud.id)} 
-                  className="text-slate-400 font-bold transition-all duration-200 hover:text-rose-500 active:scale-95"
-                  >
-                  Delete
-                  </button>
+                    <button 
+                      onClick={() => openModal(aud)} 
+                      className="text-slate-400 font-bold transition-all duration-200 hover:text-indigo-600 active:scale-95"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(aud.id)} 
+                      className="text-slate-400 font-bold transition-all duration-200 hover:text-rose-500 active:scale-95"
+                    >
+                      Delete
+                    </button>
                   </td>
-                  </tr>
-                 ))
-                 ) : (
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td colSpan="5" className="p-10 text-center text-slate-400 font-medium">
                   No audiences found matching your search.
