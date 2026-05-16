@@ -114,7 +114,7 @@ model campaigns {
   budgets   budgets[]
   campaignaudiences campaignaudiences[]
   campaignchannels  campaignchannels[]
-
+  leads  leads[]
   @@index([user_id], map: "fk_campaigns_user")
 }
 
@@ -197,6 +197,7 @@ model leads {
   statusi      String?   @default("new") @db.VarChar(50)
   created_at   DateTime? @default(now()) @db.DateTime(0)
   updated_at   DateTime? @default(now()) @db.DateTime(0)
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
 
   @@index([campaign_id], map: "fk_leads_campaign")
 }
