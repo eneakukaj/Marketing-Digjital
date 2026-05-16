@@ -5,6 +5,7 @@ import channelRoutes from "./routes/channel.routes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import audienceRoutes from './routes/audienceRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use("/api", routes);
 app.use("/api/channels", channelRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use('/api/audiences', audienceRoutes);
 app.use('/api/analytics', analyticsRoutes);

@@ -1,12 +1,20 @@
 import { 
   getUserNotifications, 
   markNotificationAsRead, 
-  toggleNotificationPreference 
+  toggleNotificationPreference,
+  getNotificationPreference
 } from "../services/notification.service.js";
 
 export const getNotifications = async (req, res) => {
   try {
-    const notifications = await getUserNotifications(req.user.id);
+    const userId = Number(req.user.id);
+    const preference = await getNotificationPreference(userId);
+
+    if (!preference || !preference.notifications_enabled) {
+      return res.json([]); 
+    }
+
+    const notifications = await getUserNotifications(userId);
     res.json(notifications);
   } catch (e) {
     res.status(500).json({ message: "Error fetching notifications" });

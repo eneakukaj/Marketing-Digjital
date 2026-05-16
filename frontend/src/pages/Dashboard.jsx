@@ -8,6 +8,7 @@ import SettingsModule from "../components/settings/SettingsModule";
 import AudienceModule from "../components/audience/AudienceModule";
 import AnalyticsModule from "../components/analytics/AnalyticsModule";
 import ABTestingModule from "../components/ABTesting/ABTestingModule";
+import DashboardOverview from "../components/dashboard/DashboardOverview";
 import axios from "axios";
 
 const Dashboard = () => {
@@ -183,15 +184,7 @@ const Dashboard = () => {
 
         <div className="p-8">
 
-          {activeTab === "Dashboard" && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <StatCard title="Active Campaigns" value="12" />
-              <StatCard title="Total Spend" value="$33,400" />
-              <StatCard title="Leads" value="1,842" />
-              <StatCard title="ROI" value="240%" />
-            </div>
-          )}
-
+          {activeTab === "Dashboard" && <DashboardOverview/>}
           {activeTab === "Campaigns" && <CampaignModule />}
           {activeTab === "Content" && <ContentModule />}
           {activeTab === "Channels" && <ChannelModule/>}
