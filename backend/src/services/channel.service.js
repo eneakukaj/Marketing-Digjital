@@ -1,5 +1,4 @@
-import prisma from "../../database/db.js";
-/*import db from "../../database/db.js";*/
+import db from "../../database/db.js";
 
 export const getAllChannels = async () => {
   return await db.channels.findMany({
@@ -41,31 +40,40 @@ export const getChannelStats = async () => {
 };
 
 export const createChannel = async (data) => {
-  const { emertimi, lloji, pershkrimi, url, statusi, campaign_id, buxheti_alokuar } = data;
+  const { emertimi, lloji, pershkrimi, url, isSocial, platforma, username, user_id } = data;
 
-  return await db.$transaction(async (tx) => {
-    const channel = await tx.channels.create({
+  if (isSocial) {
+    return await db.channels.create({
       data: {
-        emertimi,
-        lloji,
-        pershkrimi,
-        url,
-        statusi: statusi || 'aktiv'
+        emertimi: `${platforma} (@${username})`,
+        lloji: "Custom Social",
+        pershkrimi: pershkrimi || `Linked ${platforma} account.`,
+        url: url || `https://${platforma.toLowerCase()}.com/${username}`,
+        statusi: "aktiv",
+        social_account: {
+          create: {
+            user_id: parseInt(user_id),
+            platforma: platforma,
+            username: username,
+            followers: 0,
+            statusi: "aktiv"
+          }
+        }
+      },
+      include: {
+        social_account: true
       }
     });
+  }
 
-    if (campaign_id && !isNaN(Number(campaign_id))) {
-      await tx.campaignchannels.create({
-        data: {
-          campaign_id: Number(campaign_id),
-          channel_id: channel.id,
-          buxheti_alokuar: buxheti_alokuar ? Number(buxheti_alokuar) : 0,
-          statusi: 'aktiv'
-        }
-      });
+  return await db.channels.create({
+    data: {
+      emertimi,
+      lloji,
+      pershkrimi,
+      url,
+      statusi: "aktiv"
     }
-
-    return channel;
   });
 };
 

@@ -137,7 +137,6 @@ const UsersTab = ({ users, refreshUsers }) => {
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl relative">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
             <h3 className="text-xl font-bold text-slate-800 mb-6">{currentUser ? 'Edit User' : 'Add New User'}</h3>
             {errorMessage && <div className="mb-4 p-4 bg-rose-50 text-rose-600 text-sm font-bold rounded-2xl italic">{errorMessage}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -171,7 +170,21 @@ const UsersTab = ({ users, refreshUsers }) => {
                   </select>
                 </div>
               </div>
-              <button className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition-all mt-2">Save User</button>
+             <div className="flex gap-4 pt-2">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(false)}
+            className="flex-1 bg-slate-100 text-slate-700 py-4 rounded-2xl font-bold text-base hover:bg-slate-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold text-base hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-100"
+          >
+            Save User
+          </button>
+        </div>
             </form>
           </div>
         </div>

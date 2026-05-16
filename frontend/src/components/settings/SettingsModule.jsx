@@ -3,6 +3,7 @@ import ProfileTab from "./ProfileTab";
 import PasswordTab from "./PasswordTab";
 import LoginHistoryTab from "./LoginHistoryTab";
 import NotificationsTab from "./NotificationsTab";
+import SocialMediaTab from "./SocialMediaTab";
 import axios from "axios";
 
 const SettingsModule = () => {
@@ -13,6 +14,7 @@ const SettingsModule = () => {
     { id: "password", label: "Password" },
     { id: "history", label: "Login History" },
     { id: "notifications", label: "Notifications" },
+    { id: "social", label: "Social Media" },
   ];
 
   return (
@@ -38,6 +40,7 @@ const SettingsModule = () => {
       {tab === "password" && <PasswordTab />}
       {tab === "history" && <LoginHistoryTab />}
       {tab === "notifications" && <NotificationsTab />}
+      {tab === "social" && <SocialMediaTab />}
     </div>
   );
 };
