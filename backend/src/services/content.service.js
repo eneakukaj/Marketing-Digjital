@@ -1,4 +1,4 @@
-import prisma from "../../database/db.js";
+import db from "../../database/db.js";
 
 export const getAllContents = async () => {
   return await prisma.contents.findMany({

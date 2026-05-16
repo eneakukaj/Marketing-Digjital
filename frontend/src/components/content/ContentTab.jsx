@@ -87,7 +87,7 @@ const ContentTab = ({ contents, refreshContents }) => {
           onClick={() => openModal()}
           className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all"
         >
-          Add New Content
+         + Add Content
         </button>
       </div>
 

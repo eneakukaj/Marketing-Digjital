@@ -116,7 +116,7 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
           onClick={() => openModal()}
           className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
         >
-          Add New Campaign
+          + Add Campaign
         </button>
       </div>
 

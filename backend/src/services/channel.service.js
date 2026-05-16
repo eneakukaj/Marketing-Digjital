@@ -1,4 +1,5 @@
 import prisma from "../../database/db.js";
+/*import db from "../../database/db.js";*/
 
 export const getAllChannels = async () => {
   return await db.channels.findMany({

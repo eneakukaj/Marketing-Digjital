@@ -118,7 +118,7 @@ if (currentBudget) {
           onClick={() => openModal()}
           className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
         >
-          Add New Budget
+          + Add Budget
         </button>
       </div>
 
