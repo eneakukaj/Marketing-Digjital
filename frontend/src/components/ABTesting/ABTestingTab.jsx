@@ -118,7 +118,7 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
                   <td className="py-4 text-slate-600 font-semibold">{test.variant_name}</td>
                   <td className="py-4 text-slate-500 max-w-xs truncate">{test.metrics || "No metrics recorded"}</td>
                   <td className="py-4 text-right pr-4 space-x-2">
-                    <button onClick={() => openModal(test)} className="text-indigo-600 font-bold hover:underline">
+                    <button onClick={() => openModal(test)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
                       Edit
                     </button>
                     <button
@@ -126,7 +126,7 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
                         setSelectedItem(test);
                         setIsDeleteModalOpen(true);
                       }}
-                      className="text-rose-600 font-bold hover:underline"
+                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                     >
                       Delete
                     </button>
