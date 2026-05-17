@@ -52,7 +52,7 @@ const ABTestingModule = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       
-      {/* Kartelat e Statistikave sipër */}
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <OverviewCard title="Total A/B Experiments" value={totalTests.toString()} />
         <OverviewCard title="Active Variants" value={totalTests.toString()} />
@@ -88,7 +88,7 @@ const ABTestingModule = () => {
         {subTab === "Feedback" && (
           <FeedbackTab
             feedbacks={feedbacks}
-            campaigns={campaigns}
+            abTests={abTests}
             refreshData={fetchABData}
           />
         )}

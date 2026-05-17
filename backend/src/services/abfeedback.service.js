@@ -3,8 +3,9 @@ import db from "../../database/db.js";
 export const createFeedback = async (data) => {
   return await db.feedback.create({  
     data: {
-      campaign_id: Number(data.ab_test_id), 
-      comment: data.komenti, 
+      ab_test_id: Number(data.ab_test_id), 
+      comment: data.komenti,
+      user_id: 1 
     }
   });
 };
@@ -21,7 +22,7 @@ export const updateFeedback = async (id, data) => {
   return await db.feedback.update({
     where: { id: Number(id) },
     data: {
-      campaign_id: data.ab_test_id ? Number(data.ab_test_id) : undefined,
+      ab_test_id: data.ab_test_id ? Number(data.ab_test_id) : undefined, // <-- Ndryshuar këtu gjithashtu
       comment: data.komenti
     }
   });
