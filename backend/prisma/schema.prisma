@@ -15,6 +15,7 @@ model abtest {
   created_at   DateTime? @default(now()) @db.DateTime(0)
   updated_at   DateTime? @default(now()) @db.DateTime(0)
 
+campaign     campaigns @relation(fields: [campaign_id], references: [id])
   @@index([campaign_id], map: "fk_abtest_campaign")
 }
 
@@ -115,6 +116,7 @@ model campaigns {
   campaignaudiences campaignaudiences[]
   campaignchannels  campaignchannels[]
   leads  leads[]
+  abtests  abtest[]
   @@index([user_id], map: "fk_campaigns_user")
 }
 

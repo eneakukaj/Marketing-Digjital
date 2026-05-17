@@ -6,6 +6,8 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import audienceRoutes from './routes/audienceRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import abTestRoutes from "./routes/abtest.routes.js";
+import abFeedbackRoutes from "./routes/abfeedback.routes.js";
 
 const app = express();
 
@@ -23,5 +25,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use('/api/audiences', audienceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use("/api/ab-tests", abTestRoutes);
+app.use("/api/ab-feedbacks", abFeedbackRoutes);
 
 export default app;

@@ -1,36 +1,56 @@
 import db from "../../database/db.js";
 
 export const createABTest = async (data) => {
-  return await db.ab_tests.create({
+  let parsedMetrics = null;
+  if (data.metrics && data.metrics.trim() !== "") {
+    try {
+      parsedMetrics = JSON.parse(data.metrics);
+    } catch (e) {
+      parsedMetrics = { info: data.metrics };
+    }
+  }
+
+  return await db.abtest.create({
     data: {
       campaign_id: Number(data.campaign_id),
-      emri_testit: data.emri_testit,
-      metrika_klikimeve: Number(data.metrika_klikimeve) || 0,
-      buxheti_shpenzuar: Number(data.buxheti_shpenzuar) || 0,
-      statusi: data.statusi || "active"
+      variant_name: data.variant_name,
+      metrics: parsedMetrics ? JSON.stringify(parsedMetrics) : null 
     }
   });
 };
 
 export const getAllABTests = async () => {
-  return await db.ab_tests.findMany({
-    include: { campaigns: true }
+  return await db.abtest.findMany({
+    include: {
+      campaign: true 
+    }
   });
 };
 
 export const updateABTest = async (id, data) => {
-  return await db.ab_tests.update({
+  let parsedMetrics = undefined;
+  if (data.metrics !== undefined) {
+    if (data.metrics && data.metrics.trim() !== "") {
+      try {
+        parsedMetrics = JSON.stringify(JSON.parse(data.metrics));
+      } catch (e) {
+        parsedMetrics = JSON.stringify({ info: data.metrics });
+      }
+    } else {
+      parsedMetrics = null;
+    }
+  }
+
+  return await db.abtest.update({
     where: { id: Number(id) },
     data: {
       campaign_id: data.campaign_id ? Number(data.campaign_id) : undefined,
-      emri_testit: data.emri_testit,
-      metrika_klikimeve: data.metrika_klikimeve ? Number(data.metrika_klikimeve) : undefined,
-      buxheti_shpenzuar: data.buxheti_shpenzuar ? Number(data.buxheti_shpenzuar) : undefined,
-      statusi: data.statusi
+      variant_name: data.variant_name,
+      metrics: parsedMetrics
     }
   });
 };
 
 export const deleteABTest = async (id) => {
-  return await db.ab_tests.delete({ where: { id: Number(id) } });
+  return await db.abtest.delete({ where: { id: Number(id) } });
 };
