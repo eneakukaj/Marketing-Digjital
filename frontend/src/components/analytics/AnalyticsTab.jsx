@@ -7,6 +7,10 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
   const [campaigns, setCampaigns] = useState([]);
   const [channels, setChannels] = useState([]);
   
+  // State-et e reja vetëm për modalin e fshirjes
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState(null);
+
   const [formData, setFormData] = useState({
     campaign_id: '', 
     channel_id: '', 
@@ -16,28 +20,24 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
     cmimi_per_klikim: 0
   });
 
-  
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('accessToken');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       try {
-        
         const [campRes1, campRes2, chanRes] = await Promise.all([
           axios.get('http://localhost:3000/api/campaigns', config).catch(() => null),
           axios.get('http://localhost:3000/api/manager/campaigns', config).catch(() => null),
           axios.get('http://localhost:3000/api/channels', config).catch(() => null)
         ]);
 
-       
         if (campRes1 && Array.isArray(campRes1.data)) {
           setCampaigns(campRes1.data);
         } else if (campRes2 && Array.isArray(campRes2.data)) {
           setCampaigns(campRes2.data);
         }
 
-        
         if (chanRes && Array.isArray(chanRes.data)) {
           setChannels(chanRes.data);
         }
@@ -92,6 +92,29 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
     }
   };
 
+ 
+  const triggerDeleteModal = (item) => {
+    setEntryToDelete(item);
+    setIsDeleteModalOpen(true);
+  };
+
+
+  const handleDeleteConfirm = async () => {
+    if (!entryToDelete) return;
+    const token = localStorage.getItem("accessToken");
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    try {
+      await axios.delete(`http://localhost:3000/api/analytics/${entryToDelete.id}`, config);
+      refreshAnalytics();
+      setIsDeleteModalOpen(false);
+      setEntryToDelete(null);
+    } catch (err) {
+      console.error("Error deleting analytics entry:", err);
+      alert("An error occurred while deleting the analytics entry!");
+    }
+  };
+
   return (
     <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm mt-10">
       <div className="p-8 flex justify-between items-center border-b border-slate-100">
@@ -129,9 +152,15 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
                 <td className="px-8 py-5 text-right space-x-4">
                   <button 
                     onClick={() => openModal(item)} 
-                    className="text-slate-400 hover:text-slate-700 font-bold text-sm transition-colors"
+                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                   >
                     Edit
+                  </button>
+                  <button 
+                    onClick={() => triggerDeleteModal(item)} 
+                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -140,6 +169,7 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
         </table>
       </div>
 
+     
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
           <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-10 border border-slate-100 shadow-xl">
@@ -147,8 +177,6 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
               {currentEntry ? 'Update Analytics' : 'Add New Metrics'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              
-              
               <div>
                 <label className="text-xs font-bold text-slate-400 uppercase ml-1">Campaign</label>
                 <select 
@@ -164,7 +192,6 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
                 </select>
               </div>
 
-              
               <div>
                 <label className="text-xs font-bold text-slate-400 uppercase ml-1">Channel</label>
                 <select 
@@ -219,6 +246,46 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+            <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+              Are you sure?
+            </h3>
+
+            <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+              Metrics entry for campaign{" "}
+              <span className="font-bold text-[#475569]">
+                {entryToDelete?.campaign?.emertimi || `Campaign #${entryToDelete?.campaign_id}`}
+              </span>{" "}
+              will be deleted permanently.
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setEntryToDelete(null);
+                }}
+                className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

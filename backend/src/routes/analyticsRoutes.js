@@ -4,6 +4,7 @@ import { authorizeRoles } from "../middleware/authorize.middleware.js";
 import {
   getAnalyticsController,
   createAnalyticsController,
+  updateAnalyticsController,
   deleteAnalyticsController,
   getLeadsController,       
   createLeadController,     
@@ -17,6 +18,7 @@ router.use(authMiddleware);
 
 router.get("/", getAnalyticsController);
 router.post("/", authorizeRoles("ADMIN", "MANAGER"), createAnalyticsController);
+router.put("/:id", authorizeRoles("ADMIN", "MANAGER"), updateAnalyticsController);
 router.delete("/:id", authorizeRoles("ADMIN"), deleteAnalyticsController);
 router.get("/leads", getLeadsController);
 router.post("/leads", authorizeRoles("ADMIN", "MANAGER"), createLeadController);

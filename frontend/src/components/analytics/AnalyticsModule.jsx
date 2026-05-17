@@ -69,6 +69,89 @@ const AnalyticsModule = () => {
     return Object.values(channelMap);
   };
 
+  
+  const handleDownloadPDF = () => {
+    const printWindow = window.open('', '_blank');
+    
+    const tableRows = analyticsData.map(item => `
+      <tr style="border-bottom: 1px solid #e2e8f0;">
+        <td style="padding: 12px; font-weight: bold; color: #1e293b;">${item.campaign?.emertimi || `Campaign #${item.campaign_id}`}</td>
+        <td style="padding: 12px; color: #64748b;">${item.channel?.emertimi || `Channel #${item.channel_id}`}</td>
+        <td style="padding: 12px; text-align: center; color: #4f46e5; font-weight: bold;">${item.klikime}</td>
+        <td style="padding: 12px; text-align: center; color: #10b981; font-weight: bold;">${item.konvertime}</td>
+        <td style="padding: 12px; text-align: center; color: #64748b;">${item.shikime || 0}</td>
+      </tr>
+    `).join('');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Marketing Report - ${user?.emri || 'User'}</title>
+          <style>
+            body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #334155; }
+            .header { border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: 900; color: #1e293b; margin: 0; }
+            .meta { font-size: 13px; color: #94a3b8; margin-top: 5px; }
+            .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; margin-top: 20px; }
+            .stat-card { background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #f1f5f9; }
+            .stat-label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+            .stat-value { font-size: 20px; font-weight: 900; color: #1e293b; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th { background: #f8fafc; padding: 12px; text-align: left; font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">Marketing Performance Report</h1>
+            <p class="meta">Gjeneruar më: ${new Date().toLocaleDateString('sq-AL')} | Përdoruesi: ${user?.emri || 'User'} (${userRole})</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Views</div>
+              <div class="stat-value">${totalViews.toLocaleString()}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Clicks</div>
+              <div class="stat-value">${totalClicks.toLocaleString()}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Conversions</div>
+              <div class="stat-value">${totalConversions.toLocaleString()}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Conversion Rate</div>
+              <div class="stat-value">${conversionRate}%</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Campaign</th>
+                <th>Channel</th>
+                <th style="text-align: center;">Clicks</th>
+                <th style="text-align: center;">Conversions</th>
+                <th style="text-align: center;">Views</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -79,7 +162,6 @@ const AnalyticsModule = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
@@ -119,7 +201,6 @@ const AnalyticsModule = () => {
         </div>
       </div>
 
-      
       <div className="flex border-b border-slate-200 space-x-6 pb-2 pt-2">
         <button
           onClick={() => setCurrentSubTab("All Analytics")}
@@ -156,7 +237,6 @@ const AnalyticsModule = () => {
         </button>
       </div>
 
-    
       {currentSubTab === "All Analytics" && (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -208,24 +288,82 @@ const AnalyticsModule = () => {
         </>
       )}
 
+      
       {currentSubTab === "Reports" && (
         <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm animate-in fade-in duration-300">
           <div className="flex justify-between items-center border-b border-slate-100 pb-6 mb-6">
             <div>
-              <h3 className="text-xl font-black text-slate-800">Generated Reports</h3>
-              <p className="text-slate-400 text-sm">Export and review your marketing performance breakdowns</p>
+              <h3 className="text-xl font-black text-slate-800">Generated User Reports</h3>
+              <p className="text-slate-400 text-sm">Review your personalized performance metrics breakdown</p>
             </div>
-            <button className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold hover:bg-slate-800 transition-all text-sm shadow-sm">
-              Export New Report (PDF/CSV)
+            <button 
+              onClick={handleDownloadPDF}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all text-sm shadow-lg shadow-indigo-100"
+            >
+              Print PDF Report
             </button>
           </div>
-          <div className="border-2 border-dashed border-slate-200 rounded-[2rem] p-20 text-center text-slate-400 font-medium">
-            No custom reports generated yet. Click "Export New Report" to compile campaign data.
+
+          
+          <div className="mb-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Views Compiled</p>
+              <p className="text-lg font-black text-slate-700">{totalViews.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Clicks Compiled</p>
+              <p className="text-lg font-black text-indigo-600">{totalClicks.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Conversions</p>
+              <p className="text-lg font-black text-emerald-600">{totalConversions.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Avg. Conv Rate</p>
+              <p className="text-lg font-black text-slate-800">{conversionRate}%</p>
+            </div>
+          </div>
+
+          
+          <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold tracking-wider">
+                <tr>
+                  <th className="px-6 py-4">Campaign Name</th>
+                  <th className="px-6 py-4">Channel</th>
+                  <th className="px-6 py-4 text-center">Clicks</th>
+                  <th className="px-6 py-4 text-center">Conversions</th>
+                  <th className="px-6 py-4 text-center">Views</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {analyticsData.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-10 text-center text-slate-400 font-medium">
+                      No analytics data available to display.
+                    </td>
+                  </tr>
+                ) : (
+                  analyticsData.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50/50 transition-all">
+                      <td className="px-6 py-4 text-slate-800 font-bold">
+                        {item.campaign?.emertimi || `Campaign #${item.campaign_id}`}
+                      </td>
+                      <td className="px-6 py-4 text-slate-500 font-medium">
+                        {item.channel?.emertimi || `Channel #${item.channel_id}`}
+                      </td>
+                      <td className="px-6 py-4 text-center text-indigo-600 font-extrabold">{item.klikime}</td>
+                      <td className="px-6 py-4 text-center text-emerald-600 font-extrabold">{item.konvertime}</td>
+                      <td className="px-6 py-4 text-center text-slate-500 font-medium">{item.shikime || 0}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      
       {currentSubTab === "Leads" && (
         <LeadsTab />
       )}

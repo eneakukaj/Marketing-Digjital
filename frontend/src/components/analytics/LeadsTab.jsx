@@ -8,6 +8,10 @@ const LeadsTab = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentLead, setCurrentLead] = useState(null);
 
+  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [leadToDelete, setLeadToDelete] = useState(null);
+
   const [formData, setFormData] = useState({
     emri: '', 
     mbiemri: '', 
@@ -17,7 +21,6 @@ const LeadsTab = () => {
     statusi: 'aktiv'
   });
 
-  
   const fetchLeads = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -91,16 +94,25 @@ const LeadsTab = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this lead?")) return;
+ 
+  const triggerDeleteModal = (lead) => {
+    setLeadToDelete(lead);
+    setIsDeleteModalOpen(true);
+  };
+
+  
+  const handleDeleteConfirm = async () => {
+    if (!leadToDelete) return;
     
     const token = localStorage.getItem('accessToken');
     const config = { headers: { Authorization: `Bearer ${token}` } };
     try {
-      await axios.delete(`http://localhost:3000/api/analytics/leads/${id}`, config);
+      await axios.delete(`http://localhost:3000/api/analytics/leads/${leadToDelete.id}`, config);
       fetchLeads();
+      setIsDeleteModalOpen(false);
+      setLeadToDelete(null);
     } catch (err) {
-      console.error("Gabim gjatë fshirjes:", err);
+      console.error("Error deleting lead:", err);
       alert("An error occurred while deleting the lead!");
     }
   };
@@ -157,8 +169,8 @@ const LeadsTab = () => {
                   </span>
                 </td>
                 <td className="px-8 py-5 text-right space-x-4">
-                  <button onClick={() => openModal(item)} className="text-slate-400 hover:text-slate-700 font-bold text-sm transition-colors">Edit</button>
-                  <button onClick={() => handleDelete(item.id)} className="text-rose-400 hover:text-rose-600 font-bold text-sm transition-colors">Delete</button>
+                  <button onClick={() => openModal(item)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">Edit</button>
+                  <button onClick={() => triggerDeleteModal(item)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">Delete</button>
                 </td>
               </tr>
             ))}
@@ -166,6 +178,7 @@ const LeadsTab = () => {
         </table>
       </div>
 
+      
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
           <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-10 border border-slate-100 shadow-xl">
@@ -208,6 +221,46 @@ const LeadsTab = () => {
                 <button type="submit" className="flex-1 bg-indigo-600 text-white rounded-2xl font-bold py-4 shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all">{currentLead ? 'Save Changes' : 'Create Lead'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
+          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
+            <h3 className="text-[26px] font-bold text-[#1e293b] mb-3 tracking-tight">
+              Are you sure?
+            </h3>
+
+            <p className="text-[#64748b] text-base leading-relaxed mb-10 px-4">
+              Lead {" "}
+              <span className="font-bold text-[#475569]">
+                {leadToDelete?.emri} {leadToDelete?.mbiemri}
+              </span>{" "}
+              will be deleted permanently.
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setLeadToDelete(null);
+                }}
+                className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="flex-1 bg-[#e11d48] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#be123c] transition-colors shadow-md shadow-rose-100"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

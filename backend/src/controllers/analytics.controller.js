@@ -20,6 +20,15 @@ export const createAnalyticsController = async (req, res) => {
   }
 };
 
+export const updateAnalyticsController = async (req, res) => {
+  try {
+    const entry = await analyticsService.updateAnalyticsEntry(req.params.id, req.body);
+    res.json(entry);
+  } catch (e) {
+    res.status(400).json({ message: "An error occurred while updating the analytics entry!" });
+  }
+};
+
 export const deleteAnalyticsController = async (req, res) => {
   try {
     await analyticsService.deleteAnalyticsEntry(req.params.id);
