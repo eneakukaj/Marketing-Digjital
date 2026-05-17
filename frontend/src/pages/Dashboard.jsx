@@ -194,7 +194,7 @@ const Dashboard = () => {
           {activeTab === "Analytics" && <AnalyticsModule />}
           {activeTab === "A/B Testing" && <ABTestingModule />}
 
-          {!["Dashboard","Campaigns","Content","Channels", "Audience","Analytics","Security","Settings"].includes(activeTab) && (
+          {!["Dashboard","Campaigns","Content","Channels", "Audience","Analytics","Security","Settings", "A/B Testing"].includes(activeTab) && (
             <div className="bg-white p-20 text-center rounded-2xl">
               Module {activeTab} coming soon
             </div>
