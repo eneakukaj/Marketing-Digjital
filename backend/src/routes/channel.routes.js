@@ -15,7 +15,7 @@ const router = express.Router();
 router.get("/", authMiddleware, getChannelsController);
 router.get("/stats", authMiddleware, getChannelStatsController);
 
-router.post("/", authMiddleware, authorizeRoles("ADMIN", "MANAGER"), createChannelController);
+router.post("/", authMiddleware, authorizeRoles("ADMIN", "MANAGER", "USER"), createChannelController);
 router.put("/:id", authMiddleware, authorizeRoles("ADMIN", "MANAGER"), updateChannelController);
 router.delete("/:id", authMiddleware, authorizeRoles("ADMIN", "MANAGER"), deleteChannelController);
 

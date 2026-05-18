@@ -25,6 +25,8 @@ model users {
 
   userroles           userroles[]
   notifications       notifications[]
+  login_history       loginhistory[]
+  social_accounts     socialmediaaccounts[]
 }
 
 model roles {
@@ -99,3 +101,46 @@ model notifications {
 
   @@index([user_id], map: "fk_notifications_user")
 }
+
+model loginhistory {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  ip_address String?   @db.VarChar(45)
+  device     String?   @db.VarChar(255)
+  statusi    String?   @default("success") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+
+  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loginhistory_user")
+  @@index([user_id], map: "fk_loginhistory_user")
+}
+
+model channels {
+  id               Int                  @id @default(autoincrement())
+  emertimi         String               @db.VarChar(100)
+  lloji            String               @db.VarChar(100)
+  pershkrimi       String?              @db.Text
+  url              String?              @db.VarChar(255)
+  statusi          String?              @default("aktiv") @db.VarChar(50)
+  created_at       DateTime?            @default(now()) @db.DateTime(0)
+  updated_at       DateTime?            @default(now()) @db.DateTime(0)
+  
+  social_account   socialmediaaccounts?
+}
+
+model socialmediaaccounts {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  platforma  String    @db.VarChar(100)
+  username   String    @db.VarChar(100)
+  followers  Int?      @default(0)
+  statusi    String?   @default("aktiv") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+
+  channel_id Int       @unique
+  channel    channels  @relation(fields: [channel_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_socialmediaaccounts_channel")
+  
+  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_socialmediaaccounts_user")
+  @@index([user_id], map: "fk_socialmediaaccounts_user")
+}
+
