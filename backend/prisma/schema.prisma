@@ -27,6 +27,8 @@ model users {
   notifications       notifications[]
   login_history       loginhistory[]
   social_accounts     socialmediaaccounts[]
+  campaigns           campaigns[]
+  leads               leads[]
 }
 
 model roles {
@@ -125,6 +127,8 @@ model channels {
   updated_at       DateTime?            @default(now()) @db.DateTime(0)
   
   social_account   socialmediaaccounts?
+  campaignchannels campaignchannels[]
+  analytics analytics[]
 }
 
 model socialmediaaccounts {
@@ -144,3 +148,126 @@ model socialmediaaccounts {
   @@index([user_id], map: "fk_socialmediaaccounts_user")
 }
 
+model campaigns {
+  id               Int       @id @default(autoincrement())
+  emertimi         String    @db.VarChar(150)
+  pershkrimi       String?   @db.Text
+  buxheti          Decimal?  @default(0.00) @db.Decimal(12, 2)
+  data_fillimit    DateTime? @db.Date
+  data_perfundimit DateTime? @db.Date
+  statusi          String?   @default("draft") @db.VarChar(50)
+  objektivi        String?   @db.VarChar(255)
+  user_id          Int
+  created_at       DateTime? @default(now()) @db.DateTime(0)
+  updated_at       DateTime? @default(now()) @db.DateTime(0)
+
+
+  user              users               @relation(fields: [user_id], references: [id])
+  contents          contents[]
+  analytics         analytics[]
+  budgets           budgets[]
+  campaignaudiences campaignaudiences[]
+  campaignchannels  campaignchannels[]
+  leads             leads[]
+  abtests           abtest[]
+  reports           reports[]
+  scheduling        scheduling[]
+  dailysummary      dailysummary[]
+
+  @@index([user_id], map: "fk_campaigns_user")
+}
+
+model contents {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  titulli     String    @db.VarChar(200)
+  lloji       String?   @db.VarChar(100)
+  permbajtja  String?   @db.Text
+  media_url   String?   @db.VarChar(255)
+  statusi     String?   @default("draft") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+}
+
+model analytics {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  channel_id  Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  channel     channels  @relation(fields: [channel_id], references: [id])
+  klikime     Int?      @default(0)
+  shikime     Int?      @default(0)
+  konvertime  Int?      @default(0)
+}
+
+model campaignchannels {
+  id              Int       @id @default(autoincrement())
+  campaign_id     Int
+  channel_id      Int
+  buxheti_alokuar Decimal?  @default(0.00) @db.Decimal(12, 2)
+  campaign        campaigns @relation(fields: [campaign_id], references: [id])
+  channel         channels  @relation(fields: [channel_id], references: [id])
+
+  @@unique([campaign_id, channel_id])
+}
+
+model budgets {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  shuma_totale Decimal? @default(0.00) @db.Decimal(12, 2)
+}
+
+model leads {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  user_id     Int?     
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  user        users?    @relation(fields: [user_id], references: [id]) // Kjo
+  email       String    @unique @db.VarChar(150)
+}
+
+model abtest {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  variant_name String?
+}
+
+model reports {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  file_path   String?
+}
+
+model scheduling {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+}
+
+model dailysummary {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  date        DateTime  @db.Date
+}
+
+model audiences {
+  id                Int                 @id @default(autoincrement())
+  emertimi          String              @db.VarChar(150)
+  pershkrimi        String?             @db.Text
+  campaignaudiences campaignaudiences[]
+}
+
+model campaignaudiences {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  audience_id Int
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  audience    audiences @relation(fields: [audience_id], references: [id])
+
+  @@unique([campaign_id, audience_id])
+} 
