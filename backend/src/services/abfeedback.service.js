@@ -22,7 +22,7 @@ export const updateFeedback = async (id, data) => {
   return await db.feedback.update({
     where: { id: Number(id) },
     data: {
-      ab_test_id: data.ab_test_id ? Number(data.ab_test_id) : undefined, // <-- Ndryshuar këtu gjithashtu
+      ab_test_id: data.ab_test_id ? Number(data.ab_test_id) : undefined,
       comment: data.komenti
     }
   });

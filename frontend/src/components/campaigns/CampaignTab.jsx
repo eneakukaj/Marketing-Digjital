@@ -173,77 +173,89 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
   </div>
 </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="text-xs text-slate-400 uppercase tracking-wider border-b border-slate-50">
-              <th className="pb-4 font-semibold">Name</th>
-              <th className="pb-4 font-semibold">Objective</th>
-              <th className="pb-4 font-semibold">Budget</th>
-              <th className="pb-4 font-semibold">Start Date</th>
-              <th className="pb-4 font-semibold">End Date</th>
-              <th className="pb-4 font-semibold">Status</th>
-              <th className="pb-4 text-right font-semibold">Actions</th>
-            </tr>
-          </thead>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {filteredCampaigns.map((campaign) => (
+    <div
+      key={campaign.id}
+      className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group relative"
+    >
+      <div>
+        <div className="flex justify-between items-start mb-4">
+          <span
+            className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
+              campaign.statusi === "aktiv" || campaign.statusi === "active"
+                ? "bg-emerald-50 text-emerald-600"
+                : campaign.statusi === "draft"
+                ? "bg-slate-100 text-slate-500"
+                : "bg-amber-50 text-amber-600"
+            }`}
+          >
+            {campaign.statusi}
+          </span>
 
-          <tbody className="divide-y divide-slate-50">
-            {filteredCampaigns.map((campaign) => (
-              <tr key={campaign.id} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="py-4 font-medium text-slate-700">{campaign.emertimi}</td>
-                <td className="py-4 text-slate-500 text-sm">{campaign.objektivi || "N/A"}</td>
-                <td className="py-4 text-slate-500 text-sm">{campaign.buxheti || "0.00"}</td>
-                <td className="py-4 text-slate-500 text-sm">
-                  {campaign.data_fillimit ? campaign.data_fillimit.split("T")[0] : "N/A"}
-                </td>
-                <td className="py-4 text-slate-500 text-sm">
-                  {campaign.data_perfundimit ? campaign.data_perfundimit.split("T")[0] : "N/A"}
-                </td>
-                <td className="py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      campaign.statusi === "active" || campaign.statusi === "aktiv"
-                        ? "bg-emerald-50 text-emerald-600"
-                        : "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {campaign.statusi || "draft"}
-                  </span>
-                </td>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => openModal(campaign)}
+              className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
+            >
+              Edit
+            </button>
 
-                <td className="py-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => openModal(campaign)}
-                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                    >
-                      Edit
-                    </button>
+            <button
+              onClick={() => {
+                setCurrentCampaign(campaign);
+                setIsDeleteModalOpen(true);
+              }}
+              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-slate-50 rounded-xl transition-all"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
 
-                    <button
-                      onClick={() => {
-                        setCurrentCampaign(campaign);
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+        <h4 className="text-lg font-bold text-slate-800 mb-1">
+          {campaign.emertimi}
+        </h4>
 
-            {filteredCampaigns.length === 0 && (
-              <tr>
-                <td colSpan="7" className="py-10 text-center text-slate-400 text-sm">
-                  No campaigns found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <p className="text-xs font-bold text-indigo-600 mb-3 uppercase tracking-wider">
+          {campaign.objektivi || "No objective"}
+        </p>
+
+        <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+          {campaign.pershkrimi || "No description provided."}
+        </p>
       </div>
+
+      <div className="border-t border-slate-50 pt-4 mt-auto flex justify-between items-center">
+        <div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+            Budget
+          </p>
+          <p className="text-base font-bold text-slate-700">
+            ${Number(campaign.buxheti || 0).toLocaleString()}
+          </p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+            Timeline
+          </p>
+          <p className="text-xs font-semibold text-slate-600">
+            {campaign.data_fillimit
+              ? new Date(campaign.data_fillimit).toLocaleDateString()
+              : "N/A"}
+          </p>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  {filteredCampaigns.length === 0 && (
+    <div className="col-span-full py-10 text-center text-slate-400 text-sm">
+      No campaigns found
+    </div>
+  )}
+</div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">

@@ -9,16 +9,14 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
 
   const [formData, setFormData] = useState({
     ab_test_id: "",
-    komenti: "", // Kjo mbetet 'komenti' sepse kontrollohet nga state i formës lokale para dërgimit
+    komenti: "", 
   });
 
-  // PËRMIRËSUAR: Përdorimi i fushave 'comment' dhe 'abtest' nga backend-i për filtrimin
   const filteredFeedbacks = feedbacks.filter((f) =>
     f.comment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     f.abtest?.variant_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // PËRMIRËSUAR: Mbushja e formës kur klikohet 'Edit' duke lexuar 'feedback.comment'
   const openModal = (feedback = null) => {
     if (feedback) {
       setCurrentFeedback(feedback);
@@ -52,7 +50,7 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
       }
       setIsModalOpen(false);
       setCurrentFeedback(null);
-      refreshData(); // Kjo do të marrë të dhënat e freskëta dhe do t'i shfaqë menjëherë
+      refreshData(); 
     } catch (error) {
       console.error("Error saving feedback:", error);
     }
