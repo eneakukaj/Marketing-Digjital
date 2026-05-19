@@ -1,0 +1,76 @@
+model analytics {
+  id               Int       @id @default(autoincrement())
+  campaign_id      Int
+  channel_id       Int
+  klikime          Int?      @default(0)
+  shikime          Int?      @default(0)
+  konvertime       Int?      @default(0)
+  cmimi_per_klikim Decimal?  @default(0.00) @db.Decimal(10, 2)
+  data_matjes      DateTime? @default(now()) @db.DateTime(0)
+  created_at       DateTime? @default(now()) @db.DateTime(0)
+  updated_at       DateTime? @default(now()) @db.DateTime(0)
+
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+  channel  channels  @relation(fields: [channel_id], references: [id])
+
+  @@index([campaign_id], map: "fk_analytics_campaign")
+  @@index([channel_id], map: "fk_analytics_channel")
+}
+
+
+model leads {
+  id           Int       @id @default(autoincrement())
+  campaign_id  Int
+  user_id      Int?
+  emri         String?   @db.VarChar(100)
+  mbiemri      String?   @db.VarChar(100)
+  email        String    @unique(map: "email") @db.VarChar(150)
+  phone_number String?   @db.VarChar(30)
+  statusi      String?   @default("new") @db.VarChar(50)
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+  updated_at   DateTime? @default(now()) @db.DateTime(0)
+  campaign     campaigns @relation(fields: [campaign_id], references: [id])
+  user         users?    @relation(fields: [user_id], references: [id])
+
+  @@index([campaign_id], map: "fk_leads_campaign")
+  @@index([user_id], map: "fk_leads_user")
+}
+
+model reports {
+  id              Int       @id @default(autoincrement())
+  campaign_id     Int
+  titulli         String    @db.VarChar(200)
+  lloji           String?   @db.VarChar(100)
+  data_gjenerimit DateTime? @default(now()) @db.DateTime(0)
+  file_path       String?   @db.VarChar(255)
+
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_reports_campaign")
+}
+
+model costmetrics {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  channel_id  Int?
+  cost        Decimal?  @default(0.00) @db.Decimal(12, 2)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_costmetrics_campaign")
+  @@index([channel_id], map: "fk_costmetrics_channel")
+}
+
+model dailysummary {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  date        DateTime  @db.Date
+  klikime     Int?      @default(0)
+  shikime     Int?      @default(0)
+  konvertime  Int?      @default(0)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_dailysummary_campaign")
+}
