@@ -27,3 +27,12 @@ export const deleteABTest = async (req, res) => {
     res.json({ message: "A/B Test deleted successfully" });
   } catch (error) { res.status(500).json({ error: error.message }); }
 };
+
+export const voteABTest = async (req, res) => {
+  try {
+    const { variant } = req.body;
+    const userId = req.user?.id;
+    const updated = await abTestService.voteABTest(req.params.id, variant, userId);
+    res.json(updated);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+};

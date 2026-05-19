@@ -1,56 +1,89 @@
 import db from "../../database/db.js";
 
 export const createABTest = async (data) => {
-  let parsedMetrics = null;
-  if (data.metrics && data.metrics.trim() !== "") {
-    try {
-      parsedMetrics = JSON.parse(data.metrics);
-    } catch (e) {
-      parsedMetrics = { info: data.metrics };
-    }
-  }
+  const defaultMetrics = {
+    variant_a: {
+      name: data.variant_a_name || "Variant A",
+      clicks: Number(data.variant_a_clicks) || 0,
+      conversions: Number(data.variant_a_conversions) || 0,
+      votes: 0
+    },
+    variant_b: {
+      name: data.variant_b_name || "Variant B",
+      clicks: Number(data.variant_b_clicks) || 0,
+      conversions: Number(data.variant_b_conversions) || 0,
+      votes: 0
+    },
+    voted_users: []
+  };
 
   return await db.abtest.create({
     data: {
       campaign_id: Number(data.campaign_id),
       variant_name: data.variant_name,
-      metrics: parsedMetrics ? JSON.stringify(parsedMetrics) : null 
+      metrics: JSON.stringify(defaultMetrics)
     }
   });
 };
 
 export const getAllABTests = async () => {
   return await db.abtest.findMany({
-    include: {
-      campaign: true 
-    }
+    include: { campaign: true }
   });
 };
 
 export const updateABTest = async (id, data) => {
-  let parsedMetrics = undefined;
-  if (data.metrics !== undefined) {
-    if (data.metrics && data.metrics.trim() !== "") {
-      try {
-        parsedMetrics = JSON.stringify(JSON.parse(data.metrics));
-      } catch (e) {
-        parsedMetrics = JSON.stringify({ info: data.metrics });
-      }
-    } else {
-      parsedMetrics = null;
-    }
-  }
-
   return await db.abtest.update({
     where: { id: Number(id) },
     data: {
-      campaign_id: data.campaign_id ? Number(data.campaign_id) : undefined,
       variant_name: data.variant_name,
-      metrics: parsedMetrics
+      campaign_id: Number(data.campaign_id),
+      metrics: data.metrics
     }
   });
 };
 
 export const deleteABTest = async (id) => {
-  return await db.abtest.delete({ where: { id: Number(id) } });
+  return await db.abtest.delete({
+    where: { id: Number(id) }
+  });
+};
+
+export const voteABTest = async (id, variant, userId) => {
+  const currentTest = await db.abtest.findUnique({
+    where: { id: Number(id) }
+  });
+
+  if (!currentTest) throw new Error("A/B test not found");
+
+  let parsedMetrics = {};
+  try {
+    parsedMetrics = JSON.parse(currentTest.metrics);
+  } catch (e) {
+    throw new Error("Invalid metrics data format");
+  }
+
+  if (!parsedMetrics.voted_users) {
+    parsedMetrics.voted_users = [];
+  }
+
+  if (userId && parsedMetrics.voted_users.includes(userId)) {
+    throw new Error("You have already voted on this A/B test");
+  }
+
+  if (variant === "variant_a" || variant === "variant_b") {
+    parsedMetrics[variant].votes = (parsedMetrics[variant].votes || 0) + 1;
+    if (userId) {
+      parsedMetrics.voted_users.push(userId);
+    }
+  } else {
+    throw new Error("Invalid variant selected for voting");
+  }
+
+  return await db.abtest.update({
+    where: { id: Number(id) },
+    data: {
+      metrics: JSON.stringify(parsedMetrics)
+    }
+  });
 };

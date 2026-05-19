@@ -6,14 +6,29 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  
+  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
 
   const [formData, setFormData] = useState({
-    campaign_id: "", 
-    variant_name: "", 
-    metrics: ""
+    campaign_id: "",
+    variant_name: "",
+    variant_a_name: "",
+    variant_a_clicks: "0",
+    variant_a_conversions: "0",
+    variant_b_name: "",
+    variant_b_clicks: "0",
+    variant_b_conversions: "0",
   });
 
-  // Filtrimi i testetve sipas emrit të variantit
+  
+  const showNotification = (message, type = "error") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "error" });
+    }, 4000);
+  };
+
   const filteredTests = abTests.filter((test) =>
     test.variant_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -21,14 +36,30 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const openModal = (item = null) => {
     if (item) {
       setSelectedItem(item);
+      let m = { variant_a: {}, variant_b: {} };
+      try { m = JSON.parse(item.metrics); } catch (e) {}
       setFormData({
         campaign_id: item.campaign_id || "",
         variant_name: item.variant_name || "",
-        metrics: item.metrics || ""
+        variant_a_name: m.variant_a?.name || "",
+        variant_a_clicks: m.variant_a?.clicks || 0,
+        variant_a_conversions: m.variant_a?.conversions || 0,
+        variant_b_name: m.variant_b?.name || "",
+        variant_b_clicks: m.variant_b?.clicks || 0,
+        variant_b_conversions: m.variant_b?.conversions || 0,
       });
     } else {
       setSelectedItem(null);
-      setFormData({ campaign_id: "", variant_name: "", metrics: "" });
+      setFormData({
+        campaign_id: "",
+        variant_name: "",
+        variant_a_name: "",
+        variant_a_clicks: "0",
+        variant_a_conversions: "0",
+        variant_b_name: "",
+        variant_b_clicks: "0",
+        variant_b_conversions: "0",
+      });
     }
     setIsModalOpen(true);
   };
@@ -36,168 +67,333 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        campaign_id: Number(formData.campaign_id),
-        variant_name: formData.variant_name,
-        metrics: formData.metrics
-      };
-
       if (selectedItem) {
-        await api.put(`/ab-tests/${selectedItem.id}`, payload);
+        let oldVotedUsers = [];
+        try {
+          const oldMetrics = JSON.parse(selectedItem.metrics);
+          oldVotedUsers = oldMetrics.voted_users || [];
+        } catch(err) {}
+
+        const updatedMetrics = {
+          variant_a: { 
+            name: formData.variant_a_name, 
+            clicks: Number(formData.variant_a_clicks), 
+            conversions: Number(formData.variant_a_conversions), 
+            votes: Number(JSON.parse(selectedItem.metrics)?.variant_a?.votes || 0) 
+          },
+          variant_b: { 
+            name: formData.variant_b_name, 
+            clicks: Number(formData.variant_b_clicks), 
+            conversions: Number(formData.variant_b_conversions), 
+            votes: Number(JSON.parse(selectedItem.metrics)?.variant_b?.votes || 0) 
+          },
+          voted_users: oldVotedUsers
+        };
+        await api.put(`/ab-tests/${selectedItem.id}`, {
+          campaign_id: formData.campaign_id,
+          variant_name: formData.variant_name,
+          metrics: JSON.stringify(updatedMetrics)
+        });
+        showNotification("Experiment updated successfully!", "success");
       } else {
-        await api.post("/ab-tests", payload);
+        await api.post("/ab-tests", formData);
+        showNotification("Experiment created successfully!", "success");
       }
       refreshData();
       setIsModalOpen(false);
-    } catch (err) {
-      console.error("Error saving A/B Test:", err);
+    } catch (error) {
+      showNotification(error.response?.data?.error || "An error occurred while saving", "error");
+    }
+  };
+
+  const handleVote = async (id, variant) => {
+    try {
+      await api.post(`/ab-tests/${id}/vote`, { variant });
+      showNotification("Your vote has been registered successfully!", "success");
+      refreshData();
+    } catch (error) {
+      let errMsg = error.response?.data?.error || "An error occurred during voting";
+      if (errMsg.includes("votuar")) {
+        errMsg = "You have already voted for this test!";
+      }
+      showNotification(errMsg, "error");
     }
   };
 
   const handleDelete = async () => {
-    if (!selectedItem) return;
     try {
       await api.delete(`/ab-tests/${selectedItem.id}`);
+      showNotification("Experiment deleted successfully!", "success");
       refreshData();
       setIsDeleteModalOpen(false);
-      setSelectedItem(null);
-    } catch (err) {
-      console.error("Error deleting A/B Test:", err);
+    } catch (error) {
+      showNotification(error.response?.data?.error || "An error occurred while deleting", "error");
     }
   };
 
+  const calculateCR = (clicks, conversions) => {
+    const clk = Number(clicks) || 0;
+    const cnv = Number(conversions) || 0;
+    return clk > 0 ? ((cnv / clk) * 100).toFixed(1) + "%" : "0%";
+  };
+
   return (
-    <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm animate-in fade-in duration-300">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-6 mb-6">
-        <div>
-          <h3 className="text-xl font-black text-slate-800">A/B Testing Experiments</h3>
-          <p className="text-slate-400 text-sm">Manage campaign design variants and track performance split tests</p>
+    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 relative">
+      
+      
+      {toast.show && (
+        <div className="fixed top-6 right-6 z-[200] transition-all duration-300 transform translate-y-0 animate-in fade-in slide-in-from-top-5">
+          <div className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold tracking-wide ${
+            toast.type === "success" 
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800 shadow-emerald-100" 
+              : "bg-rose-50 border-rose-200 text-rose-800 shadow-rose-100"
+          }`}>
+            {toast.type === "success" ? (
+              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            ) : (
+              <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            )}
+            <span>{toast.message}</span>
+            <button onClick={() => setToast({ ...toast, show: false })} className="ml-3 text-slate-400 hover:text-slate-600 text-xs font-normal">✕</button>
+          </div>
         </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <input
+          type="text"
+          placeholder="Search A/B experiments..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="bg-white border border-slate-300 rounded-2xl px-5 py-3 text-sm w-full sm:w-80 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
         <button
           onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all text-sm shadow-sm shadow-indigo-100"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-2xl text-sm transition-all shadow-md shadow-indigo-100 flex items-center gap-2"
         >
-          + Add Variant Test
+          + Add Experiment
         </button>
       </div>
 
-      
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search variants..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-700 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-        />
-      </div>
+      <div className="grid grid-cols-1 gap-6">
+        {filteredTests.map((test) => {
+          let m = { variant_a: {}, variant_b: {} };
+          try { m = JSON.parse(test.metrics); } catch (e) {}
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
-              <th className="pb-4 pl-4">Campaign ID</th>
-              <th className="pb-4">Variant Name</th>
-              <th className="pb-4">Metrics / Results</th>
-              <th className="pb-4 text-right pr-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTests.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="text-center py-10 text-slate-400 font-medium text-sm">
-                  No A/B tests found.
-                </td>
-              </tr>
-            ) : (
-              filteredTests.map((test) => (
-                <tr key={test.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors text-sm">
-                  <td className="py-4 pl-4 font-bold text-slate-700">
-                    {campaigns.find(c => c.id === test.campaign_id)?.emertimi || `Campaign #${test.campaign_id}`}
-                  </td>
-                  <td className="py-4 text-slate-600 font-semibold">{test.variant_name}</td>
-                  <td className="py-4 text-slate-500 max-w-xs truncate">{test.metrics || "No metrics recorded"}</td>
-                  <td className="py-4 text-right pr-4 space-x-2">
-                    <button onClick={() => openModal(test)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedItem(test);
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+          return (
+            <div key={test.id} className="bg-slate-100 rounded-3xl p-6 shadow-md border border-slate-300 transition-all hover:shadow-lg">
+              <div className="flex justify-between items-start border-b border-slate-300 pb-4 mb-4">
+                <div>
+                  <span className="text-xs font-bold text-indigo-700 uppercase tracking-wider bg-indigo-100 px-3 py-1 rounded-full">
+                    {test.campaign?.emertimi || test.campaign?.emri || test.campaign?.name || `Campaign #${test.campaign_id}`}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-800 mt-2">{test.variant_name}</h3>
+                </div>
+                
+                
+                <div className="flex items-center gap-2 ml-auto bg-white border border-slate-200 p-1.5 rounded-2xl shadow-sm">
+                  <button
+                    onClick={() => openModal(test)}
+                    title="Edit"
+                    className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors flex items-center justify-center"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => { setSelectedItem(test); setIsDeleteModalOpen(true); }}
+                    title="Delete"
+                    className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors flex items-center justify-center"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shadow-sm">
+                  <div>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-bold text-slate-800 text-sm">{m.variant_a?.name || "Variant A"}</h4>
+                      <span className="text-xs font-bold text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-md border border-slate-200">Votes: {m.variant_a?.votes || 0}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center bg-slate-50 p-2 rounded-xl border border-slate-200">
+                      <div>
+                        <div className="text-[11px] uppercase font-bold text-slate-400">Clicks</div>
+                        <div className="text-sm font-bold text-slate-700">{m.variant_a?.clicks || 0}</div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] uppercase font-bold text-slate-400">Conversions</div>
+                        <div className="text-sm font-bold text-slate-700">{m.variant_a?.conversions || 0}</div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] uppercase font-bold text-emerald-600">CR %</div>
+                        <div className="text-sm font-extrabold text-emerald-600">{calculateCR(m.variant_a?.clicks, m.variant_a?.conversions)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleVote(test.id, "variant_a")}
+                    className="w-full mt-4 bg-slate-50 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold py-2 rounded-xl text-xs transition-all shadow-sm"
+                  >
+                    Vote Variant A
+                  </button>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between shadow-sm">
+                  <div>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-bold text-slate-800 text-sm">{m.variant_b?.name || "Variant B"}</h4>
+                      <span className="text-xs font-bold text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-md border border-slate-200">Votes: {m.variant_b?.votes || 0}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center bg-slate-50 p-2 rounded-xl border border-slate-200">
+                      <div>
+                        <div className="text-[11px] uppercase font-bold text-slate-400">Clicks</div>
+                        <div className="text-sm font-bold text-slate-700">{m.variant_b?.clicks || 0}</div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] uppercase font-bold text-slate-400">Conversions</div>
+                        <div className="text-sm font-bold text-slate-700">{m.variant_b?.conversions || 0}</div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] uppercase font-bold text-emerald-600">CR %</div>
+                        <div className="text-sm font-extrabold text-emerald-600">{calculateCR(m.variant_b?.clicks, m.variant_b?.conversions)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleVote(test.id, "variant_b")}
+                    className="w-full mt-4 bg-slate-50 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold py-2 rounded-xl text-xs transition-all shadow-sm"
+                  >
+                    Vote Variant B
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
-          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[500px] shadow-2xl border border-slate-100/50 mx-4">
-            <h3 className="text-2xl font-black text-slate-800 mb-6">
-              {selectedItem ? "Edit Variant Test" : "Create Variant Test"}
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-[2rem] p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-800 mb-6">
+              {selectedItem ? "Modify Experiment" : "Create New Experiment"}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Select Campaign</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Experiment Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Button Color Test"
+                  value={formData.variant_name}
+                  onChange={(e) => setFormData({ ...formData, variant_name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Select Campaign</label>
                 <select
                   required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-700 mt-1 font-medium focus:outline-none"
                   value={formData.campaign_id}
                   onChange={(e) => setFormData({ ...formData, campaign_id: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="">-- Choose Campaign --</option>
-                  {campaigns.map((c) => (
+                  <option value="">Choose a campaign...</option>
+                  {Array.isArray(campaigns) && campaigns.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.emertimi}
+                      {c.emertimi || c.emri || c.name || `Campaign #${c.id}`}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Variant Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g., Red Button Variant, Summer Banner"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-700 mt-1 font-medium focus:outline-none"
-                  value={formData.variant_name}
-                  onChange={(e) => setFormData({ ...formData, variant_name: e.target.value })}
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <h4 className="font-bold text-slate-700 text-xs uppercase mb-1">Variant A</h4>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Variant Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Red Button"
+                      required
+                      value={formData.variant_a_name}
+                      onChange={(e) => setFormData({ ...formData, variant_a_name: e.target.value })}
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Clicks</label>
+                    <input
+                      type="number"
+                      value={formData.variant_a_clicks}
+                      onChange={(e) => setFormData({ ...formData, variant_a_clicks: e.target.value })}
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Conversions</label>
+                    <input
+                      type="number"
+                      value={formData.variant_a_conversions}
+                      onChange={(e) => setFormData({ ...formData, variant_a_conversions: e.target.value })}
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Metrics Info</label>
-                <textarea
-                  rows="3"
-                  placeholder="Enter variant description, conversion goals or notes..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-700 mt-1 font-medium focus:outline-none"
-                  value={formData.metrics}
-                  onChange={(e) => setFormData({ ...formData, metrics: e.target.value })}
-                />
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <h4 className="font-bold text-slate-700 text-xs uppercase mb-1">Variant B</h4>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Variant Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Blue Button"
+                      required
+                      value={formData.variant_b_name}
+                      onChange={(e) => setFormData({ ...formData, variant_b_name: e.target.value })}
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Clicks</label>
+                    <input
+                      type="number"
+                      value={formData.variant_b_clicks}
+                      onChange={(e) => setFormData({ ...formData, variant_b_clicks: e.target.value })}
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Conversions</label>
+                    <input
+                      type="number"
+                      value={formData.variant_b_conversions}
+                      onChange={(e) => setFormData({ ...formData, variant_b_conversions: e.target.value })}
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 text-slate-400 font-bold hover:text-slate-600 transition-colors"
+                  className="flex-1 bg-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-300 transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-indigo-600 text-white rounded-2xl font-bold py-4 hover:bg-indigo-700 transition-all shadow-md"
+                  className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all text-sm shadow-md"
                 >
-                  Save Entry
+                  Save Experiment
                 </button>
               </div>
             </form>
@@ -206,22 +402,20 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
       )}
 
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
-          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
-            <h3 className="text-[26px] font-bold text-[#1e293b] mb-3">Are you sure?</h3>
-            <p className="text-[#64748b] text-base mb-10">This experiment variant will be removed permanently.</p>
-            <div className="flex gap-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-xl border border-slate-200">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Delete Experiment?</h3>
+            <p className="text-slate-500 text-sm mb-6">This action cannot be undone.</p>
+            <div className="flex gap-3">
               <button
-                type="button"
                 onClick={() => setIsDeleteModalOpen(false)}
-                className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold hover:bg-[#e2e8f0] transition-colors"
+                className="flex-1 bg-slate-200 text-slate-700 py-2 rounded-xl font-bold text-sm"
               >
                 Cancel
               </button>
               <button
-                type="button"
                 onClick={handleDelete}
-                className="flex-1 bg-rose-600 text-white py-4 rounded-2xl font-bold hover:bg-rose-700 transition-colors shadow-md"
+                className="flex-1 bg-rose-600 text-white py-2 rounded-xl font-bold text-sm hover:bg-rose-700"
               >
                 Delete
               </button>

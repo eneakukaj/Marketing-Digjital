@@ -16,7 +16,6 @@ const ABTestingModule = () => {
       const token = localStorage.getItem("accessToken");
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      // Thirrjet në API për të marrë të dhënat live nga databaza
       const [resTests, resFeedback, resCampaigns] = await Promise.all([
         axios.get("http://localhost:3000/api/ab-tests", config).catch(() => ({ data: [] })),
         axios.get("http://localhost:3000/api/ab-feedbacks", config).catch(() => ({ data: [] })),
@@ -26,10 +25,9 @@ const ABTestingModule = () => {
       setABTests(Array.isArray(resTests.data) ? resTests.data : []);
       setFeedbacks(Array.isArray(resFeedback.data) ? resFeedback.data : []);
       setCampaigns(Array.isArray(resCampaigns.data) ? resCampaigns.data : []);
-
+      loading && setLoading(false);
     } catch (err) {
-      console.error("Failed to fetch A/B Testing data:", err);
-    } finally {
+      console.error(err);
       setLoading(false);
     }
   };
@@ -38,25 +36,39 @@ const ABTestingModule = () => {
     fetchABData();
   }, []);
 
-  if (loading) {
-    return <div className="p-10 text-center font-bold text-slate-400">Loading Module Data...</div>;
-  }
-
   const totalTests = abTests.length;
+  const totalFeedbacks = feedbacks.length;
+  
+  const totalVotes = abTests.reduce((acc, test) => {
+    try {
+      const m = JSON.parse(test.metrics);
+      const votesA = Number(m?.variant_a?.votes || 0);
+      const votesB = Number(m?.variant_b?.votes || 0);
+      return acc + votesA + votesB;
+    } catch (e) {
+      return acc;
+    }
+  }, 0);
 
   const subMenus = [
     { id: "ABTests", label: "A/B Testing Experiments" },
-    { id: "Feedback", label: "User Feedback & Notes" },
+    { id: "Feedback", label: "User Feedback" }
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-slate-500 font-medium">Loading modules...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      
-      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <OverviewCard title="Total A/B Experiments" value={totalTests.toString()} />
-        <OverviewCard title="Active Variants" value={totalTests.toString()} />
-        <OverviewCard title="Tests Managed" value={totalTests.toString()} />
+        <OverviewCard title="Total Experiments" value={totalTests.toString()} />
+        <OverviewCard title="Total Feedbacks" value={totalFeedbacks.toString()} />
+        <OverviewCard title="Total Votes Cast" value={totalVotes.toString()} />
       </div>
 
       <div className="flex border-b border-gray-200 gap-8 mb-6">
@@ -81,13 +93,12 @@ const ABTestingModule = () => {
           <ABTestingTab
             abTests={abTests} 
             campaigns={campaigns} 
-            refreshData={fetchABData} 
+            refreshData={fetchABData}
           />
         )}
-
         {subTab === "Feedback" && (
-          <FeedbackTab
-            feedbacks={feedbacks}
+          <FeedbackTab 
+            feedbacks={feedbacks} 
             abTests={abTests}
             refreshData={fetchABData}
           />

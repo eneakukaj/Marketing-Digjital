@@ -11,9 +11,8 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
     ab_test_id: "",
     komenti: "", 
   });
-
+  
   const filteredFeedbacks = feedbacks.filter((f) =>
-    f.comment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     f.abtest?.variant_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -38,168 +37,154 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
     e.preventDefault();
     try {
       if (currentFeedback) {
-        await api.put(`/ab-feedbacks/${currentFeedback.id}`, {
-          ab_test_id: Number(formData.ab_test_id),
-          komenti: formData.komenti,
-        });
+        await api.put(`/ab-feedbacks/${currentFeedback.id}`, formData);
       } else {
-        await api.post("/ab-feedbacks", {
-          ab_test_id: Number(formData.ab_test_id),
-          komenti: formData.komenti,
-        });
+        await api.post("/ab-feedbacks", formData);
       }
       setIsModalOpen(false);
-      setCurrentFeedback(null);
-      refreshData(); 
-    } catch (error) {
-      console.error("Error saving feedback:", error);
+      refreshData();
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleDelete = async () => {
-    if (!currentFeedback) return;
     try {
-      await api.delete(`/ab-feedbacks/${currentFeedback.id}`);
-      setIsDeleteModalOpen(false);
-      setCurrentFeedback(null);
-      refreshData();
-    } catch (error) {
-      console.error("Error deleting feedback:", error);
+      if (currentFeedback) {
+        await api.delete(`/ab-feedbacks/${currentFeedback.id}`);
+        setIsDeleteModalOpen(false);
+        setCurrentFeedback(null);
+        refreshData();
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm animate-in fade-in duration-300">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Experiment Feedback</h2>
-          <p className="text-sm text-slate-500 mt-1">Review qualitative notes and variant performance feedback</p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <input
+          type="text"
+          placeholder="Search by experiment..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="px-4 py-2.5 w-full sm:w-72 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+        />
         <button
           onClick={() => openModal()}
-          className="w-full sm:w-auto bg-indigo-600 text-white font-bold px-6 py-3.5 rounded-2xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-95 text-sm"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-md"
         >
-          Add Feedback Note
+          Add User Feedback
         </button>
       </div>
 
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search feedback comments or variant names..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700 placeholder-slate-400"
-        />
-      </div>
-
-      <div className="overflow-x-auto rounded-2xl border border-slate-100">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50/75 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">
-              <th className="py-4 pl-4">Variant Tested</th>
-              <th className="py-4">Qualitative Feedback</th>
-              <th className="py-4 pr-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredFeedbacks.length > 0 ? (
-              filteredFeedbacks.map((f) => (
-                <tr key={f.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors text-sm">
-                  <td className="py-4 pl-4 font-bold text-slate-700">
-                    {/* PËRMIRËSUAR: Leximi nga f.abtest në vend të f.ab_tests */}
-                    {f.abtest?.variant_name || `Test ID: ${f.ab_test_id}`}
-                  </td>
-                  {/* PËRMIRËSUAR: Leximi nga f.comment në vend të f.komenti */}
-                  <td className="py-4 text-slate-600 max-w-md break-words">{f.comment}</td>
-                  <td className="py-4 text-right pr-4 space-x-2">
-                    <button onClick={() => openModal(f)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCurrentFeedback(f);
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                    >
-                      Delete
-                    </button>
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/70 border-b border-gray-100">
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Experiment Name</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Feedback Comment</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filteredFeedbacks.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="px-6 py-10 text-center text-sm text-gray-400">
+                    No feedback found for this experiment.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="py-12 text-center text-sm text-slate-400 font-medium">
-                  No feedback entries found matching your query.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredFeedbacks.map((feedback) => (
+                  <tr key={feedback.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                        {feedback.abtest?.variant_name || `ID: ${feedback.ab_test_id}`}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600 max-w-md break-words">
+                      {feedback.comment}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm font-medium space-x-3">
+                      <button
+                        onClick={() => openModal(feedback)}
+                        className="text-slate-400 hover:text-indigo-600 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentFeedback(feedback);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        className="text-slate-400 hover:text-rose-600 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Modal për Shtim / Editim */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
-          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[540px] shadow-2xl border border-slate-100/50 mx-4 animate-in zoom-in-95 duration-200">
-            <h3 className="text-[26px] font-bold text-[#1e293b] mb-2 tracking-tight">
-              {currentFeedback ? "Edit Feedback Entry" : "Create New Feedback"}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl border border-slate-50">
+            <h3 className="text-lg font-bold text-slate-800 mb-4">
+              {currentFeedback ? "Edit Feedback Entry" : "Create Feedback Entry"}
             </h3>
-            <p className="text-[#64748b] text-sm mb-8 leading-relaxed">
-              Document detailed user or team feedback regarding a specific variant configuration.
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                  Select Experiment Variant
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Select Experiment Name
                 </label>
                 <select
-                  required
                   value={formData.ab_test_id}
                   onChange={(e) => setFormData({ ...formData, ab_test_id: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700"
+                  required
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700"
                 >
-                  <option value="">-- Choose a Variant --</option>
+                  <option value="">Choose an experiment...</option>
                   {abTests.map((test) => (
                     <option key={test.id} value={test.id}>
-                      {test.variant_name || `Test #${test.id}`}
+                      {test.variant_name} (ID: {test.id})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                  Feedback Notes & Commentary
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Feedback Comment
                 </label>
                 <textarea
-                  required
-                  rows="4"
-                  placeholder="Type qualitative review findings here..."
                   value={formData.komenti}
                   onChange={(e) => setFormData({ ...formData, komenti: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700 resize-none"
+                  required
+                  rows="4"
+                  placeholder="Enter user observations or notes..."
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700 placeholder-slate-400"
                 />
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setCurrentFeedback(null);
-                  }}
-                  className="flex-1 bg-[#f1f5f9] text-[#334155] py-4 rounded-2xl font-bold text-base hover:bg-[#e2e8f0] transition-colors"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-indigo-600 text-white rounded-2xl font-bold py-4 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
+                  className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-md"
                 >
-                  Save Entry
+                  Save Feedback
                 </button>
               </div>
             </form>
@@ -207,7 +192,6 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
         </div>
       )}
 
-      {/* Modal për Konfirmim Fshirjeje */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-[2px]">
           <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-[440px] text-center shadow-2xl border border-slate-100/50 mx-4">
@@ -229,7 +213,7 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
               <button
                 type="button"
                 onClick={handleDelete}
-                className="flex-1 bg-rose-600 text-white py-4 rounded-2xl font-bold text-base hover:bg-rose-700 transition-all shadow-md shadow-rose-100"
+                className="flex-1 bg-rose-600 text-white py-4 rounded-2xl font-bold hover:bg-rose-700 transition-colors shadow-md"
               >
                 Delete
               </button>
