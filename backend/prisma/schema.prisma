@@ -8,27 +8,28 @@ datasource db {
 }
 
 model users {
-  id                  Int       @id @default(autoincrement())
-  emri                String    @db.VarChar(100)
-  mbiemri             String    @db.VarChar(100)
-  email               String    @unique(map: "email") @db.VarChar(150)
-  password_hash       String    @db.VarChar(255)
-  phone_number        String?   @db.VarChar(30)
-  email_confirmed     Boolean?  @default(false)
-  lockout_enabled     Boolean?  @default(false)
-  access_failed_count Int?      @default(0)
-  lockout_end         DateTime? @db.DateTime(0)
-  statusi             String?   @default("aktiv") @db.VarChar(50)
-  notifications_enabled Boolean @default(true)
-  created_at          DateTime? @default(now()) @db.DateTime(0)
-  updated_at          DateTime? @default(now()) @db.DateTime(0)
+  id                    Int       @id @default(autoincrement())
+  emri                  String    @db.VarChar(100)
+  mbiemri               String    @db.VarChar(100)
+  email                 String    @unique(map: "email") @db.VarChar(150)
+  password_hash         String    @db.VarChar(255)
+  phone_number          String?   @db.VarChar(30)
+  email_confirmed       Boolean?  @default(false)
+  lockout_enabled       Boolean?  @default(false)
+  access_failed_count   Int?      @default(0)
+  lockout_end           DateTime? @db.DateTime(0)
+  statusi               String?   @default("aktiv") @db.VarChar(50)
+  notifications_enabled Boolean   @default(true)
+  created_at            DateTime? @default(now()) @db.DateTime(0)
+  updated_at            DateTime? @default(now()) @db.DateTime(0)
 
-  userroles           userroles[]
-  notifications       notifications[]
-  login_history       loginhistory[]
-  social_accounts     socialmediaaccounts[]
-  campaigns           campaigns[]
-  leads               leads[]
+  userroles       userroles[]
+  notifications   notifications[]
+  login_history   loginhistory[]
+  social_accounts socialmediaaccounts[]
+  campaigns       campaigns[]
+  leads           leads[]
+  milestones      milestones[]
 }
 
 model roles {
@@ -39,7 +40,7 @@ model roles {
   created_at      DateTime? @default(now()) @db.DateTime(0)
   updated_at      DateTime? @default(now()) @db.DateTime(0)
 
-  userroles       userroles[]
+  userroles userroles[]
 }
 
 model userroles {
@@ -49,11 +50,11 @@ model userroles {
   created_at DateTime? @default(now()) @db.DateTime(0)
   updated_at DateTime? @default(now()) @db.DateTime(0)
 
-  @@unique([user_id, role_id], map: "user_id")
-  @@index([role_id], map: "fk_userroles_role")
-
   user users @relation(fields: [user_id], references: [id])
   role roles @relation(fields: [role_id], references: [id])
+
+  @@unique([user_id, role_id], map: "user_id")
+  @@index([role_id], map: "fk_userroles_role")
 }
 
 model refreshtokens {
@@ -99,7 +100,7 @@ model notifications {
   created_at  DateTime? @default(now()) @db.DateTime(0)
   updated_at  DateTime? @default(now()) @db.DateTime(0)
 
-  user        users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_user")
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_user")
 
   @@index([user_id], map: "fk_notifications_user")
 }
@@ -112,23 +113,24 @@ model loginhistory {
   statusi    String?   @default("success") @db.VarChar(50)
   created_at DateTime? @default(now()) @db.DateTime(0)
 
-  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loginhistory_user")
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_loginhistory_user")
+
   @@index([user_id], map: "fk_loginhistory_user")
 }
 
 model channels {
-  id               Int                  @id @default(autoincrement())
-  emertimi         String               @db.VarChar(100)
-  lloji            String               @db.VarChar(100)
-  pershkrimi       String?              @db.Text
-  url              String?              @db.VarChar(255)
-  statusi          String?              @default("aktiv") @db.VarChar(50)
-  created_at       DateTime?            @default(now()) @db.DateTime(0)
-  updated_at       DateTime?            @default(now()) @db.DateTime(0)
-  
+  id         Int       @id @default(autoincrement())
+  emertimi   String    @db.VarChar(100)
+  lloji      String    @db.VarChar(100)
+  pershkrimi String?   @db.Text
+  url        String?   @db.VarChar(255)
+  statusi    String?   @default("aktiv") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+
   social_account   socialmediaaccounts?
   campaignchannels campaignchannels[]
-  analytics analytics[]
+  analytics        analytics[]
 }
 
 model socialmediaaccounts {
@@ -141,10 +143,11 @@ model socialmediaaccounts {
   created_at DateTime? @default(now()) @db.DateTime(0)
   updated_at DateTime? @default(now()) @db.DateTime(0)
 
-  channel_id Int       @unique
-  channel    channels  @relation(fields: [channel_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_socialmediaaccounts_channel")
-  
-  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_socialmediaaccounts_user")
+  channel_id Int      @unique
+  channel    channels @relation(fields: [channel_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_socialmediaaccounts_channel")
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_socialmediaaccounts_user")
+
   @@index([user_id], map: "fk_socialmediaaccounts_user")
 }
 
@@ -161,7 +164,6 @@ model campaigns {
   created_at       DateTime? @default(now()) @db.DateTime(0)
   updated_at       DateTime? @default(now()) @db.DateTime(0)
 
-
   user              users               @relation(fields: [user_id], references: [id])
   contents          contents[]
   analytics         analytics[]
@@ -173,6 +175,7 @@ model campaigns {
   reports           reports[]
   scheduling        scheduling[]
   dailysummary      dailysummary[]
+  milestones        milestones[]
 
   @@index([user_id], map: "fk_campaigns_user")
 }
@@ -180,7 +183,6 @@ model campaigns {
 model contents {
   id          Int       @id @default(autoincrement())
   campaign_id Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
   titulli     String    @db.VarChar(200)
   lloji       String?   @db.VarChar(100)
   permbajtja  String?   @db.Text
@@ -188,17 +190,28 @@ model contents {
   statusi     String?   @default("draft") @db.VarChar(50)
   created_at  DateTime? @default(now()) @db.DateTime(0)
   updated_at  DateTime? @default(now()) @db.DateTime(0)
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_contents_campaign")
 }
 
 model analytics {
-  id          Int       @id @default(autoincrement())
-  campaign_id Int
-  channel_id  Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
-  channel     channels  @relation(fields: [channel_id], references: [id])
-  klikime     Int?      @default(0)
-  shikime     Int?      @default(0)
-  konvertime  Int?      @default(0)
+  id               Int       @id @default(autoincrement())
+  campaign_id      Int
+  channel_id       Int
+  klikime          Int?      @default(0)
+  shikime          Int?      @default(0)
+  konvertime       Int?      @default(0)
+  cmimi_per_klikim Decimal?  @default(0.00) @db.Decimal(10, 2)
+  data_matjes      DateTime? @default(now()) @db.DateTime(0)
+  created_at       DateTime? @default(now()) @db.DateTime(0)
+  updated_at       DateTime? @default(now()) @db.DateTime(0)
+
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+  channel  channels  @relation(fields: [channel_id], references: [id])
+
+  @@index([campaign_id], map: "fk_analytics_campaign")
+  @@index([channel_id], map: "fk_analytics_channel")
 }
 
 model campaignchannels {
@@ -206,59 +219,116 @@ model campaignchannels {
   campaign_id     Int
   channel_id      Int
   buxheti_alokuar Decimal?  @default(0.00) @db.Decimal(12, 2)
-  campaign        campaigns @relation(fields: [campaign_id], references: [id])
-  channel         channels  @relation(fields: [channel_id], references: [id])
+  statusi         String?   @default("aktiv") @db.VarChar(50)
+  created_at      DateTime? @default(now()) @db.DateTime(0)
+  updated_at      DateTime? @default(now()) @db.DateTime(0)
 
-  @@unique([campaign_id, channel_id])
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+  channel  channels  @relation(fields: [channel_id], references: [id])
+
+  @@unique([campaign_id, channel_id], map: "campaign_id")
+  @@index([channel_id], map: "fk_campaignchannels_channel")
 }
 
 model budgets {
-  id          Int       @id @default(autoincrement())
-  campaign_id Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
-  shuma_totale Decimal? @default(0.00) @db.Decimal(12, 2)
+  id              Int       @id @default(autoincrement())
+  campaign_id     Int
+  shuma_totale    Decimal?  @default(0.00) @db.Decimal(12, 2)
+  shuma_shpenzuar Decimal?  @default(0.00) @db.Decimal(12, 2)
+  shuma_mbetur    Decimal?  @default(0.00) @db.Decimal(12, 2)
+  created_at      DateTime? @default(now()) @db.DateTime(0)
+  updated_at      DateTime? @default(now()) @db.DateTime(0)
+
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_budgets_campaign")
 }
 
 model leads {
-  id          Int       @id @default(autoincrement())
-  campaign_id Int
-  user_id     Int?     
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
-  user        users?    @relation(fields: [user_id], references: [id]) // Kjo
-  email       String    @unique @db.VarChar(150)
+  id           Int       @id @default(autoincrement())
+  campaign_id  Int
+  user_id      Int?
+  emri         String?   @db.VarChar(100)
+  mbiemri      String?   @db.VarChar(100)
+  email        String    @unique(map: "email") @db.VarChar(150)
+  phone_number String?   @db.VarChar(30)
+  statusi      String?   @default("new") @db.VarChar(50)
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+  updated_at   DateTime? @default(now()) @db.DateTime(0)
+  campaign     campaigns @relation(fields: [campaign_id], references: [id])
+  user         users?    @relation(fields: [user_id], references: [id])
+
+  @@index([campaign_id], map: "fk_leads_campaign")
+  @@index([user_id], map: "fk_leads_user")
 }
 
 model abtest {
-  id          Int       @id @default(autoincrement())
-  campaign_id Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  id           Int       @id @default(autoincrement())
+  campaign_id  Int
   variant_name String?
+  metrics      String?   @db.LongText
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+  updated_at   DateTime? @default(now()) @db.DateTime(0)
+
+  campaign  campaigns  @relation(fields: [campaign_id], references: [id], map: "fk_abtest_campaign_rel")
+  feedbacks feedback[]
+
+  @@index([campaign_id], map: "fk_abtest_campaign")
 }
 
 model reports {
-  id          Int       @id @default(autoincrement())
-  campaign_id Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
-  file_path   String?
+  id              Int       @id @default(autoincrement())
+  campaign_id     Int
+  titulli         String    @db.VarChar(200)
+  lloji           String?   @db.VarChar(100)
+  data_gjenerimit DateTime? @default(now()) @db.DateTime(0)
+  file_path       String?   @db.VarChar(255)
+
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_reports_campaign")
 }
 
 model scheduling {
-  id          Int       @id @default(autoincrement())
-  campaign_id Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+  id             Int       @id @default(autoincrement())
+  campaign_id    Int
+  content_id     Int?
+  scheduled_time DateTime? @db.DateTime(0)
+  statusi        String?   @default("pending") @db.VarChar(50)
+  created_at     DateTime? @default(now()) @db.DateTime(0)
+  updated_at     DateTime? @default(now()) @db.DateTime(0)
+
+  campaign campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_scheduling_campaign")
+  @@index([content_id], map: "fk_scheduling_content")
 }
 
 model dailysummary {
   id          Int       @id @default(autoincrement())
   campaign_id Int
-  campaign    campaigns @relation(fields: [campaign_id], references: [id])
   date        DateTime  @db.Date
+  klikime     Int?      @default(0)
+  shikime     Int?      @default(0)
+  konvertime  Int?      @default(0)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+  campaign    campaigns @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_dailysummary_campaign")
 }
 
 model audiences {
   id                Int                 @id @default(autoincrement())
   emertimi          String              @db.VarChar(150)
   pershkrimi        String?             @db.Text
+  mosha_min         Int?
+  mosha_max         Int?
+  gjinia            String?             @db.VarChar(20)
+  lokacioni         String?             @db.VarChar(150)
+  interesat         String?             @db.Text
+  created_at        DateTime?           @default(now()) @db.DateTime(0)
+  updated_at        DateTime?           @default(now()) @db.DateTime(0)
   campaignaudiences campaignaudiences[]
 }
 
@@ -266,8 +336,58 @@ model campaignaudiences {
   id          Int       @id @default(autoincrement())
   campaign_id Int
   audience_id Int
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
   campaign    campaigns @relation(fields: [campaign_id], references: [id])
   audience    audiences @relation(fields: [audience_id], references: [id])
 
-  @@unique([campaign_id, audience_id])
-} 
+  @@unique([campaign_id, audience_id], map: "campaign_id")
+  @@index([audience_id], map: "fk_campaignaudiences_audience")
+}
+
+model costmetrics {
+  id          Int       @id @default(autoincrement())
+  campaign_id Int
+  channel_id  Int?
+  cost        Decimal?  @default(0.00) @db.Decimal(12, 2)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([campaign_id], map: "fk_costmetrics_campaign")
+  @@index([channel_id], map: "fk_costmetrics_channel")
+}
+
+model feedback {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  campaign_id Int?
+  ab_test_id  Int?
+  comment     String?   @db.Text
+  rating      Int?
+  statusi     String?   @default("aktiv") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  abtest abtest? @relation(fields: [ab_test_id], references: [id], map: "fk_feedback_abtest_rel")
+
+  @@index([campaign_id], map: "fk_feedback_campaign")
+  @@index([user_id], map: "fk_feedback_user")
+  @@index([ab_test_id], map: "fk_feedback_abtest")
+}
+
+model milestones {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  campaign_id Int?
+  description String?   @db.Text
+  due_date    DateTime? @db.Date
+  statusi     String?   @default("pending") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+
+  user     users      @relation(fields: [user_id], references: [id])
+  campaign campaigns? @relation(fields: [campaign_id], references: [id])
+
+  @@index([campaign_id], map: "fk_milestones_campaign")
+  @@index([user_id], map: "fk_milestones_user")
+}
