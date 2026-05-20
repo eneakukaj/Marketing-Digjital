@@ -5,6 +5,7 @@ import {
   updateAudience,
   deleteAudience
 } from "../services/audience.service.js";
+import { createNotification } from "../services/notification.service.js";
 
 export const getAudiencesController = async (req, res) => {
   try {
@@ -29,6 +30,7 @@ export const getAudienceByIdController = async (req, res) => {
 export const createAudienceController = async (req, res) => {
   try {
     const audience = await createAudience(req.body);
+    await createNotification(req.user.id,`Audience '${audience.name || 'New Audience'}' was created successfully.`);
     res.status(201).json(audience);
   } catch (e) {
     console.error("CREATE ERROR:", e);
@@ -42,6 +44,7 @@ export const updateAudienceController = async (req, res) => {
     if (!id) return res.status(400).json({ message: "ID is missing" });
 
     const audience = await updateAudience(id, req.body);
+    await createNotification(req.user.id,`Audience '${audience.name || id}' was updated successfully.`);
     res.json(audience);
   } catch (e) {
     res.status(400).json({ message: "Update failed" });
@@ -51,6 +54,7 @@ export const updateAudienceController = async (req, res) => {
 export const deleteAudienceController = async (req, res) => {
   try {
     await deleteAudience(req.params.id);
+    await createNotification(req.user.id,`Audience (ID: #${req.params.id}) was deleted successfully.`);
     res.json({ message: "Audience deleted successfully" });
   } catch (e) {
     res.status(500).json({ message: "Delete failed" });

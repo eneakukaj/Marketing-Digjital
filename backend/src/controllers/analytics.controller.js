@@ -1,4 +1,5 @@
 import * as analyticsService from "../services/analytics.service.js";
+import { createNotification } from "../services/notification.service.js";
 
 export const getAnalyticsController = async (req, res) => {
   try {
@@ -9,11 +10,10 @@ export const getAnalyticsController = async (req, res) => {
   }
 };
 
-
-
 export const createAnalyticsController = async (req, res) => {
   try {
     const entry = await analyticsService.createAnalyticsEntry(req.body);
+    await createNotification(req.user.id, "Analytics entry created successfully.");
     res.status(201).json(entry);
   } catch (e) {
     res.status(400).json({ message: "An error occurred while creating the analytics entry!" });
@@ -23,6 +23,7 @@ export const createAnalyticsController = async (req, res) => {
 export const updateAnalyticsController = async (req, res) => {
   try {
     const entry = await analyticsService.updateAnalyticsEntry(req.params.id, req.body);
+    await createNotification(req.user.id, `Analytics entry #${req.params.id} updated successfully.`);
     res.json(entry);
   } catch (e) {
     res.status(400).json({ message: "An error occurred while updating the analytics entry!" });
@@ -32,6 +33,7 @@ export const updateAnalyticsController = async (req, res) => {
 export const deleteAnalyticsController = async (req, res) => {
   try {
     await analyticsService.deleteAnalyticsEntry(req.params.id);
+    await createNotification(req.user.id, `Analytics entry #${req.params.id} deleted successfully.`);
     res.json({ message: "Analytics entry deleted successfully!" });
   } catch (e) {
     res.status(500).json({ message: "An error occurred while deleting the analytics entry!" });

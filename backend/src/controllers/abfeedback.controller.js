@@ -1,4 +1,5 @@
 import * as feedbackService from "../services/abfeedback.service.js";
+import { createNotification } from "../services/notification.service.js";
 
 export const getFeedbacks = async (req, res) => {
   try {
@@ -10,6 +11,7 @@ export const getFeedbacks = async (req, res) => {
 export const createFeedback = async (req, res) => {
   try {
     const feedback = await feedbackService.createFeedback(req.body);
+    await createNotification(req.user.id, "Feedback created successfully.");
     res.status(201).json(feedback);
   } catch (error) { res.status(500).json({ error: error.message }); }
 };
@@ -17,6 +19,7 @@ export const createFeedback = async (req, res) => {
 export const updateFeedback = async (req, res) => {
   try {
     const updated = await feedbackService.updateFeedback(req.params.id, req.body);
+    await createNotification(req.user.id, "Feedback updated successfully.");
     res.json(updated);
   } catch (error) { res.status(500).json({ error: error.message }); }
 };
@@ -24,6 +27,7 @@ export const updateFeedback = async (req, res) => {
 export const deleteFeedback = async (req, res) => {
   try {
     await feedbackService.deleteFeedback(req.params.id);
+    await createNotification(req.user.id, "Feedback deleted successfully.");
     res.json({ message: "Feedback note deleted successfully" });
   } catch (error) { res.status(500).json({ error: error.message }); }
 };

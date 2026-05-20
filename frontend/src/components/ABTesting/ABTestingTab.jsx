@@ -6,9 +6,6 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  
-  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
 
   const [formData, setFormData] = useState({
     campaign_id: "",
@@ -20,14 +17,6 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
     variant_b_clicks: "0",
     variant_b_conversions: "0",
   });
-
-  
-  const showNotification = (message, type = "error") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "error" });
-    }, 4000);
-  };
 
   const filteredTests = abTests.filter((test) =>
     test.variant_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,68 +55,68 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       if (selectedItem) {
         let oldVotedUsers = [];
+
         try {
           const oldMetrics = JSON.parse(selectedItem.metrics);
           oldVotedUsers = oldMetrics.voted_users || [];
-        } catch(err) {}
+        } catch (err) {}
 
         const updatedMetrics = {
-          variant_a: { 
-            name: formData.variant_a_name, 
-            clicks: Number(formData.variant_a_clicks), 
-            conversions: Number(formData.variant_a_conversions), 
-            votes: Number(JSON.parse(selectedItem.metrics)?.variant_a?.votes || 0) 
+          variant_a: {
+            name: formData.variant_a_name,
+            clicks: Number(formData.variant_a_clicks),
+            conversions: Number(formData.variant_a_conversions),
+            votes: Number(
+              JSON.parse(selectedItem.metrics)?.variant_a?.votes || 0
+            ),
           },
-          variant_b: { 
-            name: formData.variant_b_name, 
-            clicks: Number(formData.variant_b_clicks), 
-            conversions: Number(formData.variant_b_conversions), 
-            votes: Number(JSON.parse(selectedItem.metrics)?.variant_b?.votes || 0) 
+          variant_b: {
+            name: formData.variant_b_name,
+            clicks: Number(formData.variant_b_clicks),
+            conversions: Number(formData.variant_b_conversions),
+            votes: Number(
+              JSON.parse(selectedItem.metrics)?.variant_b?.votes || 0
+            ),
           },
-          voted_users: oldVotedUsers
+          voted_users: oldVotedUsers,
         };
+
         await api.put(`/ab-tests/${selectedItem.id}`, {
           campaign_id: formData.campaign_id,
           variant_name: formData.variant_name,
-          metrics: JSON.stringify(updatedMetrics)
+          metrics: JSON.stringify(updatedMetrics),
         });
-        showNotification("Experiment updated successfully!", "success");
       } else {
         await api.post("/ab-tests", formData);
-        showNotification("Experiment created successfully!", "success");
       }
+
       refreshData();
       setIsModalOpen(false);
     } catch (error) {
-      showNotification(error.response?.data?.error || "An error occurred while saving", "error");
+      console.error(error);
     }
   };
 
   const handleVote = async (id, variant) => {
     try {
       await api.post(`/ab-tests/${id}/vote`, { variant });
-      showNotification("Your vote has been registered successfully!", "success");
       refreshData();
     } catch (error) {
-      let errMsg = error.response?.data?.error || "An error occurred during voting";
-      if (errMsg.includes("votuar")) {
-        errMsg = "You have already voted for this test!";
-      }
-      showNotification(errMsg, "error");
+      console.error(error);
     }
   };
 
-  const handleDelete = async () => {
+   const handleDelete = async () => {
     try {
       await api.delete(`/ab-tests/${selectedItem.id}`);
-      showNotification("Experiment deleted successfully!", "success");
       refreshData();
       setIsDeleteModalOpen(false);
     } catch (error) {
-      showNotification(error.response?.data?.error || "An error occurred while deleting", "error");
+      console.error(error);
     }
   };
 
@@ -139,25 +128,6 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
 
   return (
     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 relative">
-      
-      
-      {toast.show && (
-        <div className="fixed top-6 right-6 z-[200] transition-all duration-300 transform translate-y-0 animate-in fade-in slide-in-from-top-5">
-          <div className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold tracking-wide ${
-            toast.type === "success" 
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800 shadow-emerald-100" 
-              : "bg-rose-50 border-rose-200 text-rose-800 shadow-rose-100"
-          }`}>
-            {toast.type === "success" ? (
-              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            ) : (
-              <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            )}
-            <span>{toast.message}</span>
-            <button onClick={() => setToast({ ...toast, show: false })} className="ml-3 text-slate-400 hover:text-slate-600 text-xs font-normal">✕</button>
-          </div>
-        </div>
-      )}
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <input

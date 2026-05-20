@@ -4,6 +4,7 @@ import {
   updateContent,
   deleteContent,
 } from "../services/content.service.js";
+import { createNotification } from "../services/notification.service.js";
 
 export const getContents = async (req, res) => {
   try {
@@ -17,6 +18,7 @@ export const getContents = async (req, res) => {
 export const addContent = async (req, res) => {
   try {
     const content = await createContent(req.body);
+    await createNotification(req.user.id,`Content '${content.title || 'New Item'}' was created successfully.`);
     res.status(201).json({
       message: "Content created successfully",
       content,
@@ -29,6 +31,7 @@ export const addContent = async (req, res) => {
 export const editContent = async (req, res) => {
   try {
     const content = await updateContent(req.params.id, req.body);
+    await createNotification(req.user.id,`Content '${content.title || req.params.id}' was updated successfully.`);
     res.json({
       message: "Content updated successfully",
       content,
@@ -41,6 +44,7 @@ export const editContent = async (req, res) => {
 export const removeContent = async (req, res) => {
   try {
     await deleteContent(req.params.id);
+    await createNotification(req.user.id,`Content (ID: #${req.params.id}) was deleted successfully.`);
     res.json({
       message: "Content deleted successfully",
     });
