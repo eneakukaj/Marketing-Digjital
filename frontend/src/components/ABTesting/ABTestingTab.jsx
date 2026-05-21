@@ -7,6 +7,8 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
+
   const [formData, setFormData] = useState({
     campaign_id: "",
     variant_name: "",
@@ -17,6 +19,13 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
     variant_b_clicks: "0",
     variant_b_conversions: "0",
   });
+
+  const showNotification = (message, type = "error") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "error" });
+    }, 4000);
+  };
 
   const filteredTests = abTests.filter((test) =>
     test.variant_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -104,8 +113,14 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const handleVote = async (id, variant) => {
     try {
       await api.post(`/ab-tests/${id}/vote`, { variant });
+      showNotification("Your vote has been registered successfully!", "success");
       refreshData();
     } catch (error) {
+      let errMsg = error.response?.data?.error || "An error occurred during voting";
+      if (errMsg.includes("votuar")) {
+        errMsg = "You have already voted for this test!";
+      }
+      showNotification(errMsg, "error");
       console.error(error);
     }
   };
@@ -128,7 +143,14 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
 
   return (
     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 relative">
-
+      {toast.show && (
+        <div className="fixed top-6 right-6 z-[200]">
+          <div className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold ${toast.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"}`}>
+            <span>{toast.message}</span>
+            <button onClick={() => setToast({ ...toast, show: false })} className="ml-3 text-slate-400">✕</button>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <input
           type="text"
