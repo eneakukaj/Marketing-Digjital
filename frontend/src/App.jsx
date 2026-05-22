@@ -32,10 +32,12 @@ function App() {
         </Routes>
       </main>
 
-      <div className={`${isDashboard ? 'pl-64' : ''} transition-all duration-300`}>
-        <Footer />
+      {!isDashboard && (
+        <div className="transition-all duration-300">
+          <Footer />
+        </div>
+      )}
       </div>
-    </div>
   );
 }
 
