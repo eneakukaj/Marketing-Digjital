@@ -1,7 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import api from "../../api/axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const ContentTab = ({ contents, refreshContents }) => {
+  const { user } = useContext(AuthContext);
+
+const roles = user?.roles || user?.role || [];
+
+const userRoles = Array.isArray(roles)
+  ? roles
+  : [roles];
+
+const isAdminOrManager =
+  userRoles.includes("ADMIN") ||
+  userRoles.includes("MANAGER");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentContent, setCurrentContent] = useState(null);
@@ -51,9 +63,9 @@ const ContentTab = ({ contents, refreshContents }) => {
       };
 
       if (currentContent) {
-        await api.put(`/manager/contents/${currentContent.id}`, payload);
+        await api.put(`/contents/${currentContent.id}`, payload);
       } else {
-        await api.post("/manager/contents", payload);
+        await api.post("/contents", payload);
       }
 
       await refreshContents();
@@ -66,7 +78,7 @@ const ContentTab = ({ contents, refreshContents }) => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/manager/contents/${currentContent.id}`);
+      await api.delete(`/contents/${currentContent.id}`);
       await refreshContents();
       setIsDeleteModalOpen(false);
     } catch (err) {
@@ -104,7 +116,12 @@ const ContentTab = ({ contents, refreshContents }) => {
           </thead>
 
           <tbody className="divide-y divide-slate-50">
-            {contents.map((content) => (
+            {contents.map((content) => {
+  const canModify =
+    isAdminOrManager ||
+    Number(content.campaign?.user_id) === Number(user?.id);
+
+  return (
               <tr key={content.id} className="hover:bg-slate-50/50 transition-colors">
                 <td className="py-4 font-medium text-slate-700">{content.titulli}</td>
                 <td className="py-4 text-slate-500 text-sm">{content.lloji || "N/A"}</td>
@@ -122,25 +139,30 @@ const ContentTab = ({ contents, refreshContents }) => {
                 </td>
 
                 <td className="py-4 text-right">
-                  <button
-                    onClick={() => openModal(content)}
-                    className="p-2 text-slate-400 hover:text-indigo-600"
-                  >
-                    Edit
-                  </button>
+  {canModify && (
+    <>
+      <button
+        onClick={() => openModal(content)}
+        className="p-2 text-slate-400 hover:text-indigo-600"
+      >
+        Edit
+      </button>
 
-                  <button
-                    onClick={() => {
-                      setCurrentContent(content);
-                      setIsDeleteModalOpen(true);
-                    }}
-                    className="p-2 text-slate-400 hover:text-rose-600"
-                  >
-                    Delete
-                  </button>
-                </td>
+      <button
+        onClick={() => {
+          setCurrentContent(content);
+          setIsDeleteModalOpen(true);
+        }}
+        className="p-2 text-slate-400 hover:text-rose-600"
+      >
+        Delete
+      </button>
+    </>
+  )}
+</td>
               </tr>
-            ))}
+              );
+})}
 
             {contents.length === 0 && (
               <tr>

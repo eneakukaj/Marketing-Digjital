@@ -8,7 +8,7 @@ const ContentModule = () => {
 
   const fetchContentsData = async () => {
     try {
-      const res = await api.get("/manager/contents");
+      const res = await api.get("/contents");
 
       if (Array.isArray(res.data)) {
         setContents(res.data);

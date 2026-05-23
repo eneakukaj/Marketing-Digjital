@@ -17,8 +17,8 @@ router.use(authMiddleware);
 router.get("/", getAllCampaignsController);
 router.get("/:id", getCampaignByIdController);
 
-router.post("/", authorizeRoles("MANAGER", "ADMIN"), createCampaignController);
-router.put("/:id", authorizeRoles("MANAGER", "ADMIN"), updateCampaignController);
-router.delete("/:id", authorizeRoles("MANAGER", "ADMIN"), deleteCampaignController);
+router.post("/", authorizeRoles("USER", "MANAGER", "ADMIN"), createCampaignController);
+router.put("/:id", authorizeRoles("USER", "MANAGER", "ADMIN"), updateCampaignController);
+router.delete("/:id", authorizeRoles("USER", "MANAGER", "ADMIN"), deleteCampaignController);
 
 export default router;

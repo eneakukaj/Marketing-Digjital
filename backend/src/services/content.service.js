@@ -11,6 +11,17 @@ export const getAllContents = async () => {
   });
 };
 
+export const getContentById = async (id) => {
+  return await prisma.contents.findUnique({
+    where: {
+      id: Number(id),
+    },
+    include: {
+      campaign: true,
+    },
+  });
+};
+
 export const createContent = async (data) => {
   if (!data.campaign_id || !data.titulli) {
     throw new Error("Campaign and title are required");

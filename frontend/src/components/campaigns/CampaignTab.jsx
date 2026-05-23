@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import api from "../../api/axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const CampaignTab = ({ campaigns, refreshCampaigns }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,6 +9,18 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [channels, setChannels] = useState([]);
+
+  const { user } = useContext(AuthContext);
+
+const roles = user?.roles || user?.role || [];
+
+const userRoles = Array.isArray(roles)
+  ? roles
+  : [roles];
+
+const isAdminOrManager =
+  userRoles.includes("ADMIN") ||
+  userRoles.includes("MANAGER");
 
   const [formData, setFormData] = useState({
     emertimi: "",
@@ -92,9 +105,9 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
       };
 
       if (currentCampaign) {
-        await api.put(`/manager/campaigns/${currentCampaign.id}`, payload);
+        await api.put(`/campaigns/${currentCampaign.id}`, payload);
       } else {
-        await api.post("/manager/campaigns", payload);
+        await api.post("/campaigns", payload);
       }
 
       await refreshCampaigns();
@@ -107,7 +120,7 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/admin/campaigns/${currentCampaign.id}`);
+     await api.delete(`/campaigns/${currentCampaign.id}`);
 
       await refreshCampaigns();
       setIsDeleteModalOpen(false);
@@ -174,7 +187,11 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
 </div>
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {filteredCampaigns.map((campaign) => (
+  {filteredCampaigns.map((campaign) => { 
+    const canModify =
+  isAdminOrManager ||
+  Number(campaign.user_id) === Number(user?.id);
+    return (
     <div
       key={campaign.id}
       className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group relative"
@@ -193,24 +210,26 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
             {campaign.statusi}
           </span>
 
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => openModal(campaign)}
-              className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
-            >
-              Edit
-            </button>
+          {canModify && (
+  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <button
+      onClick={() => openModal(campaign)}
+      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
+    >
+      Edit
+    </button>
 
-            <button
-              onClick={() => {
-                setCurrentCampaign(campaign);
-                setIsDeleteModalOpen(true);
-              }}
-              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-slate-50 rounded-xl transition-all"
-            >
-              Delete
-            </button>
-          </div>
+    <button
+      onClick={() => {
+        setCurrentCampaign(campaign);
+        setIsDeleteModalOpen(true);
+      }}
+      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-slate-50 rounded-xl transition-all"
+    >
+      Delete
+    </button>
+  </div>
+)}
         </div>
 
         <h4 className="text-lg font-bold text-slate-800 mb-1">
@@ -248,7 +267,8 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
         </div>
       </div>
     </div>
-  ))}
+    );
+})}
 
   {filteredCampaigns.length === 0 && (
     <div className="col-span-full py-10 text-center text-slate-400 text-sm">

@@ -1,5 +1,6 @@
 import {
   getAllContents,
+  getContentById,
   createContent,
   updateContent,
   deleteContent,
@@ -30,6 +31,32 @@ export const addContent = async (req, res) => {
 
 export const editContent = async (req, res) => {
   try {
+    const existingContent = await getContentById(req.params.id);
+
+if (!existingContent) {
+  return res.status(404).json({
+    message: "Content not found",
+  });
+}
+
+const roles = req.user.roles || req.user.role || [];
+
+const userRoles = Array.isArray(roles)
+  ? roles
+  : [roles];
+
+const isAdminOrManager =
+  userRoles.includes("ADMIN") ||
+  userRoles.includes("MANAGER");
+
+const isOwner =
+  existingContent.campaign?.user_id === req.user.id;
+
+if (!isAdminOrManager && !isOwner) {
+  return res.status(403).json({
+    message: "You can update only your own content",
+  });
+}
     const content = await updateContent(req.params.id, req.body);
     await createNotification(req.user.id,`Content '${content.title || req.params.id}' was updated successfully.`);
     res.json({
@@ -43,6 +70,32 @@ export const editContent = async (req, res) => {
 
 export const removeContent = async (req, res) => {
   try {
+    const existingContent = await getContentById(req.params.id);
+
+if (!existingContent) {
+  return res.status(404).json({
+    message: "Content not found",
+  });
+}
+
+const roles = req.user.roles || req.user.role || [];
+
+const userRoles = Array.isArray(roles)
+  ? roles
+  : [roles];
+
+const isAdminOrManager =
+  userRoles.includes("ADMIN") ||
+  userRoles.includes("MANAGER");
+
+const isOwner =
+  existingContent.campaign?.user_id === req.user.id;
+
+if (!isAdminOrManager && !isOwner) {
+  return res.status(403).json({
+    message: "You can delete only your own content",
+  });
+}
     await deleteContent(req.params.id);
     await createNotification(req.user.id,`Content (ID: #${req.params.id}) was deleted successfully.`);
     res.json({
