@@ -12,15 +12,28 @@ const CampaignTab = ({ campaigns, refreshCampaigns }) => {
 
   const { user } = useContext(AuthContext);
 
-const roles = user?.roles || user?.role || [];
+const roles =
+  user?.roles ||
+  user?.role ||
+  user?.userroles?.map((ur) => ur.role?.normalized_name) ||
+  [];
 
 const userRoles = Array.isArray(roles)
   ? roles
   : [roles];
 
+const normalizedRoles = userRoles.map((r) =>
+  r.toUpperCase()
+);
+
 const isAdminOrManager =
-  userRoles.includes("ADMIN") ||
-  userRoles.includes("MANAGER");
+  normalizedRoles.includes("ADMIN") ||
+  normalizedRoles.includes("MANAGER");
+
+console.log("USER DATA:", user);
+console.log("USER ROLES:", userRoles);
+console.log("NORMALIZED:", normalizedRoles);
+console.log("IS ADMIN:", isAdminOrManager);
 
   const [formData, setFormData] = useState({
     emertimi: "",

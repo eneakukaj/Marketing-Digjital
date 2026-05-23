@@ -5,7 +5,11 @@ import { AuthContext } from "../../context/AuthContext";
 const ContentTab = ({ contents, refreshContents }) => {
   const { user } = useContext(AuthContext);
 
-const roles = user?.roles || user?.role || [];
+const roles =
+  user?.roles ||
+  user?.role ||
+  user?.userroles?.map((ur) => ur.role?.normalized_name) ||
+  [];
 
 const userRoles = Array.isArray(roles)
   ? roles
