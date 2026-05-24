@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import api from "../../api/axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [toast, setToast] = useState({ show: false, message: "", type: "error" });
+  const { user } = useContext(AuthContext);
+
+  const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?.normalized_name) || [];
+  const userRoles = Array.isArray(roles) ? roles : [roles];
+  const normalizedRoles = userRoles.map((r) => typeof r === 'string' ? r.toUpperCase() : '');
+  const isAdminOrManager = normalizedRoles.includes("ADMIN") || normalizedRoles.includes("MANAGER");
 
   const [formData, setFormData] = useState({
     campaign_id: "",
@@ -171,6 +177,7 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
         {filteredTests.map((test) => {
           let m = { variant_a: {}, variant_b: {} };
           try { m = JSON.parse(test.metrics); } catch (e) {}
+          const canModify = isAdminOrManager || Number(test.user_id) === Number(user?.id);
 
           return (
             <div key={test.id} className="bg-slate-100 rounded-3xl p-6 shadow-md border border-slate-300 transition-all hover:shadow-lg">
@@ -182,7 +189,7 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
                   <h3 className="text-lg font-bold text-slate-800 mt-2">{test.variant_name}</h3>
                 </div>
                 
-                
+                {canModify && (
                 <div className="flex items-center gap-2 ml-auto bg-white border border-slate-200 p-1.5 rounded-2xl shadow-sm">
                   <button
                     onClick={() => openModal(test)}
@@ -203,6 +210,7 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
                     </svg>
                   </button>
                 </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

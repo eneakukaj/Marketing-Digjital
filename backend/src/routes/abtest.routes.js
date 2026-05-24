@@ -16,7 +16,7 @@ router.use(authMiddleware);
 router.get("/", getABTests);
 router.post("/", authorizeRoles("USER", "MANAGER", "ADMIN"), createABTest);
 router.post("/:id/vote", authorizeRoles("USER", "MANAGER", "ADMIN"), voteABTest);
-router.put("/:id", authorizeRoles("MANAGER", "ADMIN"), updateABTest);
-router.delete("/:id", authorizeRoles("MANAGER", "ADMIN"), deleteABTest);
+router.put("/:id", authorizeRoles("USER", "MANAGER", "ADMIN"), updateABTest);
+router.delete("/:id", authorizeRoles("USER", "MANAGER", "ADMIN"), deleteABTest);
 
 export default router;

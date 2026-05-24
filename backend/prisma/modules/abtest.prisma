@@ -22,6 +22,8 @@ model abtest {
   campaign_id  Int
   variant_name String?
   metrics      String?   @db.LongText
+  user_id      Int?
+  user         users?     @relation(fields: [user_id], references: [id])
   created_at   DateTime? @default(now()) @db.DateTime(0)
   updated_at   DateTime? @default(now()) @db.DateTime(0)
 
@@ -29,5 +31,6 @@ model abtest {
   feedbacks feedback[]
 
   @@index([campaign_id], map: "fk_abtest_campaign")
+  @@index([user_id], map: "fk_abtest_user")
 }
 

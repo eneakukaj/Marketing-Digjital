@@ -21,8 +21,15 @@ export const createABTest = async (data) => {
     data: {
       campaign_id: Number(data.campaign_id),
       variant_name: data.variant_name,
-      metrics: JSON.stringify(defaultMetrics)
+      metrics: JSON.stringify(defaultMetrics),
+      user_id: data.user_id ? Number(data.user_id) : null
     }
+  });
+};
+
+export const getABTestById = async (id) => {
+  return await db.abtest.findUnique({
+    where: { id: Number(id) }
   });
 };
 
