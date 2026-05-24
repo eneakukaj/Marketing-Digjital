@@ -9,6 +9,7 @@ model feedback {
   created_at  DateTime? @default(now()) @db.DateTime(0)
   updated_at  DateTime? @default(now()) @db.DateTime(0)
 
+  user        users     @relation(fields: [user_id], references: [id], map: "fk_feedback_user_rel")
   abtest abtest? @relation(fields: [ab_test_id], references: [id], map: "fk_feedback_abtest_rel")
 
   @@index([campaign_id], map: "fk_feedback_campaign")

@@ -1,11 +1,11 @@
 import db from "../../database/db.js";
 
-export const createFeedback = async (data) => {
+export const createFeedback = async (data, userId) => {
   return await db.feedback.create({  
     data: {
       ab_test_id: Number(data.ab_test_id), 
       comment: data.komenti,
-      user_id: 1 
+      user_id: Number(userId)
     }
   });
 };
@@ -15,6 +15,12 @@ export const getAllFeedbacks = async () => {
     include: {
       abtest: true 
     }
+  });
+};
+
+export const getFeedbackById = async (id) => {
+  return await db.feedback.findUnique({
+    where: { id: Number(id) }
   });
 };
 

@@ -1,11 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import api from "../../api/axios";
 
 const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
+  const { user } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const canEdit = (item) => {
+    const roles = user?.roles || user?.role || user?.userroles || [];
+    const userRoles = Array.isArray(roles) ? roles : [roles];
+    const normalizedRoles = userRoles.map(r => 
+      typeof r === 'string' ? r.toUpperCase() : (r?.role?.normalized_name || r?.normalized_name || '').toUpperCase()
+    );
+    const isAdminOrManager = normalizedRoles.includes("ADMIN") || normalizedRoles.includes("MANAGER");
+    
+    return isAdminOrManager || Number(item.user_id) === Number(user?.id);
+  };
 
   const [formData, setFormData] = useState({
     ab_test_id: "",
@@ -108,6 +121,8 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
                       {feedback.comment}
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium space-x-3">
+                      {canEdit(feedback) && (
+                        <>
                       <button
                         onClick={() => openModal(feedback)}
                         className="text-slate-400 hover:text-indigo-600 transition-colors"
@@ -123,6 +138,8 @@ const FeedbackTab = ({ feedbacks = [], abTests = [], refreshData }) => {
                       >
                         Delete
                       </button>
+                      </>
+                      )}
                     </td>
                   </tr>
                 ))

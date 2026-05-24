@@ -17,8 +17,8 @@ router.use(authMiddleware);
 router.get("/", getFeedbacks);
 
 
-router.post("/", authorizeRoles("MANAGER", "ADMIN"), createFeedback);
-router.put("/:id", authorizeRoles("MANAGER", "ADMIN"), updateFeedback);
-router.delete("/:id", authorizeRoles("MANAGER", "ADMIN"), deleteFeedback);
+router.post("/", authorizeRoles("USER", "MANAGER", "ADMIN"), createFeedback);
+router.put("/:id", authorizeRoles("USER", "MANAGER", "ADMIN"), updateFeedback);
+router.delete("/:id", authorizeRoles("USER", "MANAGER", "ADMIN"), deleteFeedback);
 
 export default router;

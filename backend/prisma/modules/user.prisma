@@ -22,6 +22,7 @@ model users {
   leads           leads[]
   milestones      milestones[]
   abtests         abtest[]
+  feedbacks       feedback[]
 }
 
 model roles {
