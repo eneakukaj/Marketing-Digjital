@@ -109,13 +109,13 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
                   <td className="p-4 text-right space-x-4">
                     <button 
                       onClick={() => openModal(aud)} 
-                      className="text-slate-400 font-bold transition-all duration-200 hover:text-indigo-600 active:scale-95"
+                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                     >
                       Edit
                     </button>
                     <button 
                       onClick={() => handleDelete(aud.id)} 
-                      className="text-slate-400 font-bold transition-all duration-200 hover:text-rose-500 active:scale-95"
+                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                     >
                       Delete
                     </button>

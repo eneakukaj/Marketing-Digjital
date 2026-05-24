@@ -40,7 +40,7 @@ export const getChannelStats = async () => {
 };
 
 export const createChannel = async (data) => {
-  const { emertimi, lloji, pershkrimi, url, isSocial, platforma, username, user_id } = data;
+  const { emertimi, lloji, pershkrimi, url, isSocial, platforma, username, user_id, statusi, campaign_id, buxheti_alokuar } = data;
 
   if (isSocial) {
     return await db.channels.create({
@@ -49,7 +49,8 @@ export const createChannel = async (data) => {
         lloji: "Custom Social",
         pershkrimi: pershkrimi || `Linked ${platforma} account.`,
         url: url || `https://${platforma.toLowerCase()}.com/${username}`,
-        statusi: "aktiv",
+        statusi: statusi || 'aktiv',
+        user_id: user_id ? Number(user_id) : undefined,
         social_account: {
           create: {
             user_id: parseInt(user_id),
@@ -66,14 +67,26 @@ export const createChannel = async (data) => {
     });
   }
 
+ const channelData = {
+    emertimi,
+    lloji,
+    pershkrimi,
+    url,
+    statusi: statusi || "aktiv", 
+  };
+
+  
+  if (campaign_id && !isNaN(Number(campaign_id))) {
+    channelData.campaignchannels = {
+      create: {
+        campaign_id: Number(campaign_id),
+        buxheti_alokuar: buxheti_alokuar ? Number(buxheti_alokuar) : 0,
+        statusi: 'aktiv' 
+      }
+    };
+  }
   return await db.channels.create({
-    data: {
-      emertimi,
-      lloji,
-      pershkrimi,
-      url,
-      statusi: "aktiv"
-    }
+    data: channelData
   });
 };
 

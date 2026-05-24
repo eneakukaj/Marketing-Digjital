@@ -92,8 +92,8 @@ const handleSubmit = async (e) => {
                 </div>
               </td>
               <td className="px-6 py-4 text-right">
-                <button onClick={() => openModal(role)} className="text-indigo-600 font-bold mr-4 text-sm hover:underline">Edit</button>
-                <button onClick={() => { setRoleToDelete(role); setIsDeleteModalOpen(true);}} className="text-rose-600 font-bold text-sm hover:underline">Delete</button>
+                <button onClick={() => openModal(role)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">Edit</button>
+                <button onClick={() => { setRoleToDelete(role); setIsDeleteModalOpen(true);}} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">Delete</button>
               </td>
             </tr>
           ))}

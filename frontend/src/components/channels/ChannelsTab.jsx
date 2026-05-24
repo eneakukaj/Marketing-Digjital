@@ -143,14 +143,20 @@ const ChannelsTab = ({ channels, refreshChannels, userRole }) => {
                 </span>
               </td>
               <td className="px-6 py-4">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase ${channel.statusi === 'aktiv' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                  {channel.statusi}
-                </span>
-              </td>
+              <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${
+              channel.statusi?.toLowerCase() === 'aktiv' || channel.statusi?.toLowerCase() === 'active'
+                ? 'bg-green-50 text-green-700'
+                : 'bg-gray-100 text-gray-600'
+              }`}>
+            {channel.statusi?.toLowerCase() === 'aktiv' || channel.statusi?.toLowerCase() === 'active' 
+              ? 'Active' 
+              : 'Passive'}
+             </span>
+            </td>
               {isAuthorized && (
                 <td className="px-6 py-4 text-right">
-                  <button onClick={() => openModal(channel)} className="text-indigo-600 font-bold mr-4 text-sm hover:underline">Edit</button>
-                  <button onClick={() => { setChannelToDelete(channel); setIsDeleteModalOpen(true); }} className="text-rose-600 font-bold text-sm hover:underline">Delete</button>
+                  <button onClick={() => openModal(channel)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">Edit</button>
+                  <button onClick={() => { setChannelToDelete(channel); setIsDeleteModalOpen(true); }} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">Delete</button>
                 </td>
               )}
             </tr>
@@ -182,11 +188,17 @@ const ChannelsTab = ({ channels, refreshChannels, userRole }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-500 ml-1">Status</label>
-                  <select className="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm mt-1 focus:ring-2 focus:ring-indigo-500 appearance-none" value={formData.statusi} onChange={(e) => setFormData({...formData, statusi: e.target.value})}>
-                    <option value="aktiv">Aktiv</option>
-                    <option value="pasiv">Pasiv</option>
-                  </select>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={formData.statusi}
+                    onChange={(e) => setFormData({ ...formData, statusi: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700"
+                   >
+                   <option value="aktiv">Active</option>
+                   <option value="pasiv">Passive</option>
+                   </select>
                 </div>
               </div>
 

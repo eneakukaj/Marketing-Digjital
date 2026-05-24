@@ -173,7 +173,7 @@ const TokensTab = () => {
                 <td className="px-6 py-4 text-right">
                   <button
                     onClick={() => openModal(token)}
-                    className="text-indigo-600 font-bold mr-4 text-sm hover:underline"
+                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                   >
                     View
                   </button>
@@ -182,7 +182,7 @@ const TokensTab = () => {
                     <button
                       onClick={() => {setTokenToRevoke(token);
                         setIsRevokeModalOpen(true);}}
-                      className="text-amber-600 font-bold mr-4 text-sm hover:underline"
+                      className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
                     >
                       Revoke
                     </button>
@@ -192,7 +192,7 @@ const TokensTab = () => {
                     onClick={() => {
                       setTokenToDelete(token);
                       setIsDeleteModalOpen(true);}}
-                    className="text-rose-600 font-bold text-sm hover:underline"
+                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                   >
                     Delete
                   </button>
