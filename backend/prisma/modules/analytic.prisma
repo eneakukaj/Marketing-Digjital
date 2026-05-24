@@ -2,6 +2,7 @@ model analytics {
   id               Int       @id @default(autoincrement())
   campaign_id      Int
   channel_id       Int
+  user_id          Int?
   klikime          Int?      @default(0)
   shikime          Int?      @default(0)
   konvertime       Int?      @default(0)

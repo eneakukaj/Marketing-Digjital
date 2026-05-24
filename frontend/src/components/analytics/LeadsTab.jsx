@@ -1,7 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
 const LeadsTab = () => {
+  const { user } = useContext(AuthContext);
+  const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?.normalized_name) || [];
+  const userRoles = Array.isArray(roles) ? roles : [roles];
+  const normalizedRoles = userRoles.map((r) => typeof r === 'string' ? r.toUpperCase() : '');
+  
+  const isAdmin = normalizedRoles.includes("ADMIN");
+  const isManager = normalizedRoles.includes("MANAGER");
+  const isUser = !isAdmin && !isManager;
+
   const [leads, setLeads] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,12 +136,14 @@ const LeadsTab = () => {
           <h3 className="text-slate-800 font-black text-xl">Leads Performance Report</h3>
           <p className="text-slate-400 text-sm">Track and manage contacts generated exclusively from campaigns</p>
         </div>
-        <button 
-          onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 text-sm"
-        >
-          + Add Lead
-        </button>
+       {!isUser && (
+          <button 
+            onClick={() => openModal()}
+            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 text-sm"
+          >
+            + Add Lead
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
@@ -169,8 +181,22 @@ const LeadsTab = () => {
                   </span>
                 </td>
                 <td className="px-8 py-5 text-right space-x-4">
-                  <button onClick={() => openModal(item)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">Edit</button>
-                  <button onClick={() => triggerDeleteModal(item)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">Delete</button>
+                  {!isUser && (
+                    <button 
+                      onClick={() => openModal(item)} 
+                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                    >
+                      Edit
+                    </button>
+                  )}
+                 {(isAdmin || (isManager && Number(item.user_id) === Number(user?.id))) && (
+                    <button 
+                      onClick={() => triggerDeleteModal(item)} 
+                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

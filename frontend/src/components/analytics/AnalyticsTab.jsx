@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
 const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
+  const { user } = useContext(AuthContext);
+  const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?.normalized_name) || [];
+  const userRoles = Array.isArray(roles) ? roles : [roles];
+  const normalizedRoles = userRoles.map((r) => typeof r === 'string' ? r.toUpperCase() : '');
+  
+  const isAdmin = normalizedRoles.includes("ADMIN");
+  const isManager = normalizedRoles.includes("MANAGER");
+  const isUser = !isAdmin && !isManager;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEntry, setCurrentEntry] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
   const [channels, setChannels] = useState([]);
   
-  // State-et e reja vetëm për modalin e fshirjes
+  
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState(null);
 
@@ -119,12 +128,14 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
     <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm mt-10">
       <div className="p-8 flex justify-between items-center border-b border-slate-100">
         <h3 className="text-slate-800 font-black text-xl">Detailed Metrics Report</h3>
-        <button 
-          onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 text-sm"
-        >
-          + Add Analytics
-        </button>
+        {!isUser && (
+          <button 
+            onClick={() => openModal()}
+            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 text-sm"
+          >
+            + Add Analytics
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
@@ -149,19 +160,23 @@ const AnalyticsTab = ({ analytics = [], refreshAnalytics }) => {
                 </td>
                 <td className="px-8 py-5 text-center text-indigo-600 font-extrabold">{item.klikime}</td>
                 <td className="px-8 py-5 text-center text-emerald-600 font-extrabold">{item.konvertime}</td>
-                <td className="px-8 py-5 text-right space-x-4">
-                  <button 
-                    onClick={() => openModal(item)} 
-                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    onClick={() => triggerDeleteModal(item)} 
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                  >
-                    Delete
-                  </button>
+               <td className="px-8 py-5 text-right space-x-4">
+                  {!isUser && (
+                    <button 
+                      onClick={() => openModal(item)} 
+                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  {(isAdmin || (isManager && Number(item.user_id) === Number(user?.id))) && (
+                    <button 
+                      onClick={() => triggerDeleteModal(item)} 
+                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

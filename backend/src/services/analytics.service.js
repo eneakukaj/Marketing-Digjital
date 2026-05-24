@@ -26,7 +26,8 @@ export const createAnalyticsEntry = async (data) => {
       klikime: Number(data.klikime || 0),
       shikime: Number(data.shikime || 0),
       konvertime: Number(data.konvertime || 0),
-      cmimi_per_klikim: parseFloat(data.cmimi_per_klikim || 0)
+      cmimi_per_klikim: parseFloat(data.cmimi_per_klikim || 0),
+      user_id: data.user_id ? Number(data.user_id) : null // 
     }
   });
 };
@@ -62,6 +63,11 @@ export const getAllLeads = async () => {
   });
 };
 
+export const getLeadById = async (id) => {
+  return await prisma.leads.findUnique({
+    where: { id: Number(id) }
+  });
+};
 
 export const createLeadEntry = async (data) => {
   return await prisma.leads.create({
@@ -71,7 +77,8 @@ export const createLeadEntry = async (data) => {
       email: data.email,
       phone_number: data.phone_number,
       statusi: data.statusi || 'aktiv',
-      campaign_id: data.campaign_id ? Number(data.campaign_id) : null
+      campaign_id: data.campaign_id ? Number(data.campaign_id) : null,
+      user_id: data.user_id ? Number(data.user_id) : null  
     }
   });
 };

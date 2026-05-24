@@ -19,10 +19,10 @@ router.use(authMiddleware);
 router.get("/", getAnalyticsController);
 router.post("/", authorizeRoles("ADMIN", "MANAGER"), createAnalyticsController);
 router.put("/:id", authorizeRoles("ADMIN", "MANAGER"), updateAnalyticsController);
-router.delete("/:id", authorizeRoles("ADMIN"), deleteAnalyticsController);
+router.delete("/:id", authorizeRoles("ADMIN", "MANAGER"), deleteAnalyticsController);
 router.get("/leads", getLeadsController);
 router.post("/leads", authorizeRoles("ADMIN", "MANAGER"), createLeadController);
 router.put("/leads/:id", authorizeRoles("ADMIN", "MANAGER"), updateLeadController);
-router.delete("/leads/:id", authorizeRoles("ADMIN"), deleteLeadController);
+router.delete("/leads/:id", authorizeRoles("ADMIN", "MANAGER"), deleteLeadController);
 
 export default router;
