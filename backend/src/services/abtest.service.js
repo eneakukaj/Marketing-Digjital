@@ -65,7 +65,7 @@ export const voteABTest = async (id, variant, userId) => {
 
   let parsedMetrics = {};
   try {
-    parsedMetrics = JSON.parse(currentTest.metrics);
+    parsedMetrics = currentTest.metrics ? JSON.parse(currentTest.metrics) : {};
   } catch (e) {
     throw new Error("Invalid metrics data format");
   }
@@ -74,12 +74,16 @@ export const voteABTest = async (id, variant, userId) => {
     parsedMetrics.voted_users = [];
   }
 
+  if (!parsedMetrics.variant_a) parsedMetrics.variant_a = { name: "Variant A", clicks: 0, conversions: 0, votes: 0 };
+  if (!parsedMetrics.variant_b) parsedMetrics.variant_b = { name: "Variant B", clicks: 0, conversions: 0, votes: 0 };
+  if (!parsedMetrics.voted_users) parsedMetrics.voted_users = [];
+
   if (userId && parsedMetrics.voted_users.includes(userId)) {
     throw new Error("You have already voted on this A/B test");
   }
 
   if (variant === "variant_a" || variant === "variant_b") {
-    parsedMetrics[variant].votes = (parsedMetrics[variant].votes || 0) + 1;
+    parsedMetrics[variant].votes = (Number(parsedMetrics[variant].votes) || 0) + 1;
     if (userId) {
       parsedMetrics.voted_users.push(userId);
     }

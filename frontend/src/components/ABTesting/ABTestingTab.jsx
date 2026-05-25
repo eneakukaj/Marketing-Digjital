@@ -151,7 +151,7 @@ const ABTestingTab = ({ abTests = [], campaigns = [], refreshData }) => {
     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 relative">
       {toast.show && (
         <div className="fixed top-6 right-6 z-[200]">
-          <div className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold ${toast.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"}`}>
+         <div className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold ${toast.type === "success" ? "bg-blue-50 border-blue-200 text-blue-800" : "bg-rose-50 border-rose-200 text-rose-800"}`}>
             <span>{toast.message}</span>
             <button onClick={() => setToast({ ...toast, show: false })} className="ml-3 text-slate-400">✕</button>
           </div>

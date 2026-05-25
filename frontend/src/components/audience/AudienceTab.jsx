@@ -1,7 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
 const AudienceTab = ({ audiences, refreshAudiences }) => {
+  const { user } = useContext(AuthContext);
+
+const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?.normalized_name) || [];
+  const userRoles = Array.isArray(roles) ? roles : [roles];
+  const normalizedRoles = userRoles.map((r) => {
+    if (typeof r === 'string') return r.toUpperCase();
+    return (r?.role?.normalized_name || r?.normalized_name || r?.name || '').toUpperCase();
+  });
+  
+  const isAdmin = normalizedRoles.includes("ADMIN");
+  const isManager = normalizedRoles.includes("MANAGER");
+  const canModify = isAdmin || isManager;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentAudience, setCurrentAudience] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // State për filtrin
@@ -15,6 +29,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
   );
 
   const openModal = (audience = null) => {
+    if (!canModify) return;
     if (audience) {
       setCurrentAudience(audience);
       setFormData({ ...audience });
@@ -27,6 +42,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!canModify) return;
     const token = localStorage.getItem("accessToken");
     const dataToSend = {
       ...formData,
@@ -52,6 +68,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
   };
 
   const handleDelete = async (id) => {
+    if (!canModify) return;
     if (!window.confirm("Are you sure?")) return;
     const token = localStorage.getItem("accessToken");
     try {
@@ -75,12 +92,14 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
           />
         </div>
 
+        {canModify && (
         <button 
           onClick={() => openModal()} 
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
         >
           + Add Audience
         </button>
+        )}
       </div>
 
       <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
@@ -91,7 +110,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
               <th className="p-4">Age Group</th>
               <th className="p-4">Gender</th>
               <th className="p-4">Location</th>
-              <th className="p-4 text-right">Actions</th>
+              {canModify && <th className="p-4 text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="text-slate-600 text-sm">
@@ -106,6 +125,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
                     </span>
                   </td>
                   <td className="p-4">{aud.lokacioni}</td>
+                  {canModify && (
                   <td className="p-4 text-right space-x-4">
                     <button 
                       onClick={() => openModal(aud)} 
@@ -120,6 +140,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
                       Delete
                     </button>
                   </td>
+                  )}
                 </tr>
               ))
             ) : (
@@ -133,7 +154,7 @@ const AudienceTab = ({ audiences, refreshAudiences }) => {
         </table>
       </div>
 
-      {isModalOpen && (
+      {isModalOpen &&  canModify && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[2.5rem] w-full max-w-lg p-10 shadow-2xl animate-in zoom-in-95 duration-200">
             <h3 className="text-2xl font-black text-slate-800 mb-8">
