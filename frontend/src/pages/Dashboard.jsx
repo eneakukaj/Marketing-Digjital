@@ -15,6 +15,13 @@ const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("Dashboard");
 
+  const userRolesList = user?.userroles || [];
+
+  const isAdmin = userRolesList.some(item => 
+    item?.role?.normalized_name === "ADMIN" || 
+    item?.role?.emertimi?.toUpperCase() === "ADMIN"
+  );
+
   const [notifications, setNotifications] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const token = localStorage.getItem("accessToken");
@@ -87,6 +94,7 @@ const Dashboard = () => {
           ))}
 
           <div className="mt-10 pt-4 border-t border-white/5 space-y-2">
+          {isAdmin && (
             <button
               onClick={() => setActiveTab("Security")}
               className={`w-full px-4 py-3 rounded-xl text-sm font-bold ${
@@ -97,6 +105,7 @@ const Dashboard = () => {
             >
               Users & Auth
             </button>
+          )}
 
             <button
               onClick={() => setActiveTab("Settings")}
@@ -189,7 +198,7 @@ const Dashboard = () => {
           {activeTab === "Content" && <ContentModule />}
           {activeTab === "Channels" && <ChannelModule/>}
           {activeTab === "Audience" && <AudienceModule />}
-          {activeTab === "Security" && <SecurityModule />}
+          {activeTab === "Security" && isAdmin && <SecurityModule />}
           {activeTab === "Settings" && <SettingsModule />}
           {activeTab === "Analytics" && <AnalyticsModule />}
           {activeTab === "A/B Testing" && <ABTestingModule />}

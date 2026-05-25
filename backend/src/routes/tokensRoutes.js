@@ -7,6 +7,9 @@ import {
 
 const router = express.Router();
 
+router.use(authMiddleware);
+router.use(authorizeRoles("ADMIN"));
+
 router.get("/", getTokens);
 router.put("/revoke/:id", revokeToken);
 router.delete("/:id", deleteToken);
