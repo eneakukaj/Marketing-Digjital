@@ -15,6 +15,31 @@ const MilestoneTab = ({ campaigns, user }) => {
     statusi: "pending",
   });
 
+  const roles =
+  user?.roles ||
+  user?.role ||
+  user?.userRoles ||
+  user?.userroles ||
+  [];
+
+const userRoles = Array.isArray(roles) ? roles : [roles];
+
+const normalizedRoles = userRoles.map((r) =>
+  typeof r === "string"
+    ? r.toUpperCase()
+    : (
+        r?.role?.normalized_name ||
+        r?.role?.name ||
+        r?.normalized_name ||
+        r?.name ||
+        ""
+      ).toUpperCase()
+);
+
+const isAdminOrManager =
+  normalizedRoles.includes("ADMIN") ||
+  normalizedRoles.includes("MANAGER");
+
   const fetchMilestones = async () => {
     try {
       const res = await api.get("/manager/milestones");
@@ -109,12 +134,14 @@ if (currentMilestone) {
           </p>
         </div>
 
-        <button
-          onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
-        >
-          + Add Milestone
-        </button>
+        {isAdminOrManager && (
+  <button
+    onClick={() => openModal()}
+    className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+  >
+    + Add Milestone
+  </button>
+)}
       </div>
 
       <div className="overflow-x-auto">
@@ -125,7 +152,9 @@ if (currentMilestone) {
               <th className="pb-4 font-semibold">Description</th>
               <th className="pb-4 font-semibold">Due Date</th>
               <th className="pb-4 font-semibold">Status</th>
+              {isAdminOrManager && (
               <th className="pb-4 text-right font-semibold">Actions</th>
+              )}
             </tr>
           </thead>
 
@@ -150,6 +179,7 @@ if (currentMilestone) {
     </span>
   </td>
 
+  {isAdminOrManager && (
   <td className="py-4 text-right">
     <div className="flex justify-end gap-2">
       <button
@@ -170,6 +200,7 @@ if (currentMilestone) {
       </button>
     </div>
   </td>
+)}
 </tr>
             ))}
 

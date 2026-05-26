@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 
-const BudgetTab = ({ campaigns }) => {
+const BudgetTab = ({ campaigns, user }) => {
   const [budgets, setBudgets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBudget, setCurrentBudget] = useState(null);
@@ -14,6 +14,31 @@ const BudgetTab = ({ campaigns }) => {
     shuma_shpenzuar: "",
     shuma_mbetur: "",
   });
+
+  const roles =
+  user?.roles ||
+  user?.role ||
+  user?.userRoles ||
+  user?.userroles ||
+  [];
+
+const userRoles = Array.isArray(roles) ? roles : [roles];
+
+const normalizedRoles = userRoles.map((r) =>
+  typeof r === "string"
+    ? r.toUpperCase()
+    : (
+        r?.role?.normalized_name ||
+        r?.role?.name ||
+        r?.normalized_name ||
+        r?.name ||
+        ""
+      ).toUpperCase()
+);
+
+const isAdminOrManager =
+  normalizedRoles.includes("ADMIN") ||
+  normalizedRoles.includes("MANAGER");
 
   const fetchBudgets = async () => {
     try {
@@ -114,12 +139,14 @@ if (currentBudget) {
           </p>
         </div>
 
-        <button
-          onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
-        >
-          + Add Budget
-        </button>
+        {isAdminOrManager && (
+  <button
+    onClick={() => openModal()}
+    className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+  >
+    + Add Budget
+  </button>
+)}
       </div>
 
       <div className="overflow-x-auto">
@@ -142,9 +169,11 @@ if (currentBudget) {
                 Remaining Amount
               </th>
 
+              {isAdminOrManager && (
               <th className="pb-4 text-right font-semibold">
                 Actions
               </th>
+              )}
             </tr>
           </thead>
 
@@ -170,6 +199,7 @@ if (currentBudget) {
     {budget.shuma_mbetur}
   </td>
 
+  {isAdminOrManager && (
   <td className="py-4 text-right">
     <div className="flex justify-end gap-2">
       <button
@@ -190,6 +220,7 @@ if (currentBudget) {
       </button>
     </div>
   </td>
+)}
 </tr>
             ))}
 

@@ -103,11 +103,11 @@ const CampaignModule = () => {
       )}
 
       {subTab === "Scheduling" && (
-        <SchedulingTab campaigns={campaigns} />
+        <SchedulingTab campaigns={campaigns} user={user} />
       )}
 
       {subTab === "Budgets" && (
-        <BudgetTab campaigns={campaigns} />
+        <BudgetTab campaigns={campaigns} user={user} />
       )}
 
       {subTab === "Milestones" && (

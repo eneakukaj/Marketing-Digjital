@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 
-const SchedulingTab = ({ campaigns }) => {
+const SchedulingTab = ({ campaigns, user }) => {
   const [schedules, setSchedules] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSchedule, setCurrentSchedule] = useState(null);
@@ -13,6 +13,22 @@ const SchedulingTab = ({ campaigns }) => {
     scheduled_time: "",
     statusi: "pending",
   });
+
+  const roles =
+  user?.roles ||
+  user?.role ||
+  user?.userroles?.map((ur) => ur.role?.normalized_name) ||
+  [];
+
+const userRoles = Array.isArray(roles) ? roles : [roles];
+
+const normalizedRoles = userRoles.map((role) =>
+  typeof role === "string" ? role.toUpperCase() : ""
+);
+
+const isAdminOrManager =
+  normalizedRoles.includes("ADMIN") ||
+  normalizedRoles.includes("MANAGER");
 
   const fetchSchedules = async () => {
     try {
@@ -120,12 +136,13 @@ if (currentSchedule) {
           </p>
         </div>
 
-        <button
-          onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
-        >
-          + Add Schedule
-        </button>
+        {isAdminOrManager && (
+  <button onClick={() => openModal()}
+    className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+  >
+    + Add Schedule
+  </button>
+)}
       </div>
 
       <div className="overflow-x-auto">
@@ -148,9 +165,11 @@ if (currentSchedule) {
                 Status
               </th>
 
+              {isAdminOrManager && (
               <th className="pb-4 text-right font-semibold">
                 Actions
               </th>
+              )}
             </tr>
           </thead>
 
@@ -183,6 +202,7 @@ if (currentSchedule) {
   </td>
 
   <td className="py-4 text-right">
+  {isAdminOrManager && (
     <div className="flex justify-end gap-2">
       <button
         onClick={() => openModal(schedule)}
@@ -201,7 +221,8 @@ if (currentSchedule) {
         Delete
       </button>
     </div>
-  </td>
+  )}
+</td>
 </tr>
             ))}
 
