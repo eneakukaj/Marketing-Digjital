@@ -1,15 +1,23 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, lazy, Suspense } from "react";
 import { AuthContext } from "../context/AuthContext";
-import SecurityModule from "../components/security/SecurityModule";
-import CampaignModule from "../components/campaigns/CampaignModule";
-import ContentModule from "../components/content/ContentModule";
-import ChannelModule from "../components/channels/ChannelModule";
-import SettingsModule from "../components/settings/SettingsModule";
-import AudienceModule from "../components/audience/AudienceModule";
-import AnalyticsModule from "../components/analytics/AnalyticsModule";
-import ABTestingModule from "../components/ABTesting/ABTestingModule";
-import DashboardOverview from "../components/dashboard/DashboardOverview";
 import axios from "axios";
+
+const SecurityModule = lazy(() => import("../components/security/SecurityModule"));
+const CampaignModule = lazy(() => import("../components/campaigns/CampaignModule"));
+const ContentModule = lazy(() => import("../components/content/ContentModule"));
+const ChannelModule = lazy(() => import("../components/channels/ChannelModule"));
+const SettingsModule = lazy(() => import("../components/settings/SettingsModule"));
+const AudienceModule = lazy(() => import("../components/audience/AudienceModule"));
+const AnalyticsModule = lazy(() => import("../components/analytics/AnalyticsModule"));
+const ABTestingModule = lazy(() => import("../components/ABTesting/ABTestingModule"));
+const DashboardOverview = lazy(() => import("../components/dashboard/DashboardOverview"));
+
+const ModuleLoader = () => (
+  <div className="flex flex-col items-center justify-center p-20 bg-white rounded-2xl shadow-sm">
+    <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+    <p className="mt-4 text-sm font-bold text-slate-500">Loading...</p>
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -192,7 +200,7 @@ const Dashboard = () => {
         </header>
 
         <div className="p-8">
-
+          <Suspense fallback={<ModuleLoader />}>
           {activeTab === "Dashboard" && <DashboardOverview/>}
           {activeTab === "Campaigns" && <CampaignModule />}
           {activeTab === "Content" && <ContentModule />}
@@ -208,7 +216,7 @@ const Dashboard = () => {
               Module {activeTab} coming soon
             </div>
           )}
-
+          </Suspense>
         </div>
       </main>
     </div>
