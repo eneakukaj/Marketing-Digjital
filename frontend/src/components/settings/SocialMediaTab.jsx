@@ -159,13 +159,14 @@ const SocialMediaTab = () => {
                   <td className="p-5 text-right space-x-3">
                     <button
                       onClick={() => openEditModal(ac)}
-                      className="text-indigo-600 hover:text-indigo-900 font-bold text-xs"
+                      className="p-2 text-slate-400 hover:text-indigo-600"
+      
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => openDeleteModal(ac)}
-                      className="text-rose-600 hover:text-rose-900 font-bold text-xs"
+                      className="p-2 text-slate-400 hover:text-rose-600"
                     >
                       Delete
                     </button>

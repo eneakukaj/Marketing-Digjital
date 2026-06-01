@@ -7,9 +7,6 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (loading) return <div>...</div>;
 
-  console.log("USER:", user);
-console.log("USER ROLES:", user?.userroles);
-console.log("ALLOWED:", allowedRoles);
 
   if (!user) {
     return <Navigate to="/login" replace />;

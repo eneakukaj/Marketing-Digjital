@@ -18,7 +18,8 @@ const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentAudience, setCurrentAudience] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // State për filtrin
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     emertimi: '', pershkrimi: '', mosha_min: '', mosha_max: '', gjinia: 'All', lokacioni: '', interesat: ''
   });
@@ -67,15 +68,15 @@ const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!canModify) return;
-    if (!window.confirm("Are you sure?")) return;
+  const handleDelete = async () => {
+    if (!canModify || !currentAudience) return;
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.delete(`http://localhost:3000/api/audiences/${id}`, {
+      await axios.delete(`http://localhost:3000/api/audiences/${currentAudience.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       refreshAudiences();
+      setIsDeleteModalOpen(false);
     } catch (err) { console.error(err); }
   };
 
@@ -134,7 +135,10 @@ const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?
                       Edit
                     </button>
                     <button 
-                      onClick={() => handleDelete(aud.id)} 
+                      onClick={() => {
+                        setCurrentAudience(aud);
+                        setIsDeleteModalOpen(true);
+                      }}
                       className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                     >
                       Delete
@@ -199,6 +203,35 @@ const roles = user?.roles || user?.role || user?.userroles?.map((ur) => ur.role?
           </div>
         </div>
       )}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm text-center shadow-2xl border border-slate-100">
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Are you sure?</h3>
+
+            <p className="text-slate-500 text-sm mb-8">
+              Audience <b>{currentAudience?.emertimi}</b> will be deleted permanently.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDelete}
+                className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold hover:bg-rose-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };

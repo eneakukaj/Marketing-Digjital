@@ -189,7 +189,8 @@ const isAdminOrManager =
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="number"
-                placeholder="Campaign ID"
+                min="105"
+                placeholder="Please choose a Campaign ID above 105"
                 className="w-full bg-slate-50 rounded-2xl p-4"
                 value={formData.campaign_id}
                 onChange={(e) => setFormData({ ...formData, campaign_id: e.target.value })}
@@ -263,7 +264,7 @@ const isAdminOrManager =
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm text-center shadow-2xl border border-slate-100">
-            <div className="text-4xl mb-4">⚠️</div>
+            
 
             <h3 className="text-xl font-bold text-slate-800 mb-2">Are you sure?</h3>
 

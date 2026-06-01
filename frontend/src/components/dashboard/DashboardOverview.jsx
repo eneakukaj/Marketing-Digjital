@@ -456,7 +456,7 @@ const DashboardOverview = () => {
             </table>
           </div>
         </div>
-=
+
         <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200/60 shadow-sm flex flex-col">
           <div className="mb-4">
             <h3 className="text-lg font-black text-slate-900 tracking-tight">A/B Testing Revenue & Lift Matrix</h3>
