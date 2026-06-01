@@ -7,7 +7,6 @@ import {
 
 export const registerUser = async (req, res) => {
   try {
-    console.log("Data from React:", req.body);
     const user = await register(req.body);
     res.status(201).json({
       message: "User registered successfully",
@@ -23,12 +22,18 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const result = await login(email, password);
+     res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     res.json({
       message: "Login successful",
       user: result.user,
       roles: result.roles,
       accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
     });
   } catch (err) {
     res.status(401).json({ error: err.message });
@@ -37,8 +42,11 @@ export const loginUser = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
-    const result = await refresh(refreshToken);
+    const token = req.cookies.refreshToken;
+    if (!token) {
+      return res.status(401).json({ error: "No refresh token" });
+    }
+    const result = await refresh(token);
     res.json({
       message: "Token refreshed",
       accessToken: result.accessToken,
@@ -50,9 +58,12 @@ export const refreshToken = async (req, res) => {
 
 export const logoutUser = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
-    const result = await logout(refreshToken);
-    res.json(result);
+    const token = req.cookies.refreshToken;
+    await logout(token);
+
+    res.clearCookie("refreshToken");
+
+    res.json({ message: "Logged out successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -50,23 +50,19 @@ export const createChannel = async (data) => {
         pershkrimi: pershkrimi || `Linked ${platforma} account.`,
         url: url || `https://${platforma.toLowerCase()}.com/${username}`,
         statusi: statusi || 'aktiv',
-        user_id: user_id ? Number(user_id) : undefined,
-        social_account: {
-          create: {
-            user_id: parseInt(user_id),
-            platforma: platforma,
-            username: username,
-            followers: 0,
-            statusi: "aktiv"
-          }
-        }
       },
-      include: {
-        social_account: true
-      }
+    });
+   await db.socialmediaaccounts.create({
+      data: {
+        user_id: Number(user_id),
+        channel_id: channel.id,
+        platforma,
+        username,
+        followers: 0,
+        statusi: "aktiv",
+      },
     });
   }
-
  const channelData = {
     emertimi,
     lloji,
@@ -86,7 +82,10 @@ export const createChannel = async (data) => {
     };
   }
   return await db.channels.create({
-    data: channelData
+    data: channelData,
+    include: {
+      campaignchannels: true,
+    },
   });
 };
 

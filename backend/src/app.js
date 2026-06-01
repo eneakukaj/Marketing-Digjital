@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import routes from "./routes/index.js";
 import channelRoutes from "./routes/channel.routes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
@@ -12,12 +13,13 @@ import abFeedbackRoutes from "./routes/abfeedback.routes.js";
 const app = express();
 
 app.use(cors({
-  origin: "*", 
+  origin: "http://localhost:5173", 
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api", routes);
 app.use("/api/channels", channelRoutes);

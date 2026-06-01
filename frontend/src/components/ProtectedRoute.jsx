@@ -5,15 +5,21 @@ import { AuthContext } from '../context/AuthContext';
 const ProtectedRoute = ({ allowedRoles }) => {
   const { user, loading } = useContext(AuthContext);
 
-  if (loading) return <div>Duke u ngarkuar...</div>;
+  if (loading) return <div>...</div>;
+
+  console.log("USER:", user);
+console.log("USER ROLES:", user?.userroles);
+console.log("ALLOWED:", allowedRoles);
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 if (allowedRoles) {
-    const hasPermission = user.userroles?.some(ur => 
-      allowedRoles.includes(ur.role?.normalized_name)
-    );
+    const hasPermission = user.userroles?.some(ur => {
+    const roleName = ur.role?.normalized_name;
+  return allowedRoles.some(ar => ar.toLowerCase() === roleName?.toLowerCase());
+});
+
 
     if (!hasPermission) {
       return (

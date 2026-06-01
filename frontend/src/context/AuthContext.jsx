@@ -7,13 +7,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('accessToken');
-    
-    if (savedUser && token) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/auth/me", {
+          withCredentials: true,
+        });
+        console.log("Response nga /me:", res.data);
+        setUser(res.data);
+      } catch (err) {
+        console.log("Error ne fetchUser:", err.response?.data || err.message);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
   }, []);
 
 const login = (userData, token) => {
@@ -23,17 +32,24 @@ const login = (userData, token) => {
     setUser(userData);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3000/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+    } catch (err) {}
     setUser(null);
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
   };
 
   
   const hasRole = (roleName) => {
-    if (!user || !user.userroles) return false;
-    return user.userroles.some(ur => ur.role?.normalized_name === roleName);
+    return user?.userroles?.some(
+      (ur) => ur.role?.normalized_name === roleName
+    );
   };
 
   return (

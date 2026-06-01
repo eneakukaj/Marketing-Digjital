@@ -2,6 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:3000/api",
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
@@ -21,11 +22,11 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshTokenValue = localStorage.getItem('refreshToken');
-        
-        const res = await axios.post("http://localhost:3000/api/auth/refresh", {
-          token: refreshTokenValue
-        });
+        const res = await axios.post(
+          "http://localhost:3000/api/auth/refresh",
+          {},
+          { withCredentials: true }
+        );
 
         if (res.status === 200) {
           const { accessToken } = res.data;
@@ -35,7 +36,8 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch (err) {
-        localStorage.clear();
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
         window.location.href = '/login';
         return Promise.reject(err);
       }

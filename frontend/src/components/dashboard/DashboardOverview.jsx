@@ -17,7 +17,6 @@ const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#3b82f6", "#ec4899", "#8b5cf6"
 const DashboardOverview = () => {
   const [loading, setLoading] = useState(true);
   
-  // Dynamic API State
   const [campaigns, setCampaigns] = useState([]);
   const [analytics, setAnalytics] = useState([]);
   const [leads, setLeads] = useState([]);
@@ -77,7 +76,6 @@ const DashboardOverview = () => {
     }
   }, [token]);
 
-  // Format Helpers
   const formatCurrency = (val) => {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(val);
   };
@@ -86,7 +84,6 @@ const DashboardOverview = () => {
     return new Intl.NumberFormat("en-US").format(val);
   };
 
-  // Dynamic Calculations
   const totalCampaigns = campaigns.length;
   const activeCampaignsCount = campaigns.filter(c => c.statusi?.toLowerCase() === "aktiv" || c.statusi?.toLowerCase() === "active").length;
   
@@ -98,7 +95,6 @@ const DashboardOverview = () => {
   const totalAllocatedBudget = budgets.reduce((sum, item) => sum + (Number(item.shuma_totale) || 0), 0);
   const totalSpentBudget = budgets.reduce((sum, item) => sum + (Number(item.shuma_shpenzuar) || 0), 0);
 
-  // Dynamic Performance Charts Grouping
   const performanceChartData = analytics.map((item) => ({
     name: item.campaign?.emertimi || `Campaign #${item.campaign_id}`,
     Clicks: Number(item.klikime) || 0,
@@ -106,7 +102,6 @@ const DashboardOverview = () => {
     Impressions: Number(item.shikime) || 0,
   }));
 
-  // Dynamic Channel Types Allocation
   const totalChannelsCount = channels.length;
   const channelTypeCounts = channels.reduce((acc, curr) => {
     const type = curr.lloji || "Other";
@@ -120,7 +115,6 @@ const DashboardOverview = () => {
     percentage: totalChannelsCount > 0 ? Math.round((channelTypeCounts[key] / totalChannelsCount) * 100) : 0
   })).sort((a, b) => b.value - a.value);
 
-  // Dynamic Budget Calculation Progress Map
   const dynamicBudgetTracker = budgets.map((b) => {
     const linkedCampaign = campaigns.find((c) => c.id === b.campaign_id);
     const total = Number(b.shuma_totale) || 0;
@@ -137,7 +131,6 @@ const DashboardOverview = () => {
     };
   });
 
-  // Combined Dynamic Milestones and Scheduling Timeline Events
   const liveMonitoringTimeline = [
     ...milestones.map((m) => ({
       id: `milestone-${m.id}`,
@@ -157,7 +150,6 @@ const DashboardOverview = () => {
     }))
   ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Strategic Performance Leaderboard
   const campaignEfficiencyLeaderboard = analytics.map((item) => {
     const linkedCampaign = campaigns.find((c) => c.id === item.campaign_id);
     const clicks = Number(item.klikime) || 0;
@@ -178,7 +170,6 @@ const DashboardOverview = () => {
   }).sort((a, b) => parseFloat(b.cvr) - parseFloat(a.cvr));
 
 
-  // LOGJIKA E RE DINAMIKE BAZUAR NE VOTA (CLICKS / CONVERSIONS)
   const processedAbData = abTests.map((test) => {
     const linkedCampaign = campaigns.find((c) => c.id === test.campaign_id);
     const clicksA = Number(test.variant_a_clicks) || 0;
@@ -200,7 +191,6 @@ const DashboardOverview = () => {
       winner = test.variant_a_name || "Variant A";
       lift = cvrB > 0 ? ((cvrA - cvrB) / cvrB) * 100 : cvrA * 100;
     } else {
-      // Nëse Shkalla e Konvertimit është e njëjtë (p.sh. 0.00%), krahasojmë "Votat/Klikimet" e papërpunuara
       if (clicksB > clicksA) {
         winner = `${test.variant_b_name || "Variant B"} (By Clicks)`;
         lift = clicksA > 0 ? ((clicksB - clicksA) / clicksA) * 100 : clicksB * 100;
@@ -238,8 +228,6 @@ const DashboardOverview = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 p-6 md:p-10 space-y-10 font-sans">
-      
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-6 gap-4">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Executive Performance Dashboard</h1>
@@ -254,7 +242,6 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Top Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm transition-all hover:shadow-md">
           <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Total Campaigns</p>
@@ -298,7 +285,6 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200/60 shadow-sm lg:col-span-2 flex flex-col">
           <div className="mb-6">
@@ -363,7 +349,6 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Budget and Timelines */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200/60 shadow-sm flex flex-col">
           <div className="mb-4">
@@ -432,8 +417,6 @@ const DashboardOverview = () => {
           </div>
         </div>
       </div>
-
-      {/* Leaderboard and A/B Testing Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200/60 shadow-sm lg:col-span-2 flex flex-col">
           <div className="mb-4">
@@ -473,8 +456,7 @@ const DashboardOverview = () => {
             </table>
           </div>
         </div>
-
-        {/* PANELI I RI DINAMIK ME LOGJIKEN E RE TE SHPËNDARJES SË VOTAVE */}
+=
         <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200/60 shadow-sm flex flex-col">
           <div className="mb-4">
             <h3 className="text-lg font-black text-slate-900 tracking-tight">A/B Testing Revenue & Lift Matrix</h3>
