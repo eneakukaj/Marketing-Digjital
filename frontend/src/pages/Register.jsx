@@ -66,7 +66,6 @@ const Register = () => {
     await registerUser(form); 
     
     
-    alert("Account created successfully!");
     navigate("/login");
   } catch (err) {
    
