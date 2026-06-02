@@ -43,7 +43,7 @@ export const createChannel = async (data) => {
   const { emertimi, lloji, pershkrimi, url, isSocial, platforma, username, user_id, statusi, campaign_id, buxheti_alokuar } = data;
 
   if (isSocial) {
-    return await db.channels.create({
+    const channel = await db.channels.create({
       data: {
         emertimi: `${platforma} (@${username})`,
         lloji: "Custom Social",
