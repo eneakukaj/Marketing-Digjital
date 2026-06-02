@@ -9,6 +9,7 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import abTestRoutes from "./routes/abtest.routes.js";
 import abFeedbackRoutes from "./routes/abfeedback.routes.js";
+import genderRoutes from "./routes/gender.routes.js";
 
 const app = express();
 
@@ -29,5 +30,6 @@ app.use('/api/audiences', audienceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use("/api/ab-tests", abTestRoutes);
 app.use("/api/ab-feedbacks", abFeedbackRoutes);
+app.use("/api/genders", genderRoutes);
 
 export default app;

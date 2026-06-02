@@ -11,6 +11,7 @@ const AudienceModule = lazy(() => import("../components/audience/AudienceModule"
 const AnalyticsModule = lazy(() => import("../components/analytics/AnalyticsModule"));
 const ABTestingModule = lazy(() => import("../components/ABTesting/ABTestingModule"));
 const DashboardOverview = lazy(() => import("../components/dashboard/DashboardOverview"));
+const GenderModule = lazy(() => import ("../components/gender/GenderModule"));
 
 const ModuleLoader = () => (
   <div className="flex flex-col items-center justify-center p-20 bg-white rounded-2xl shadow-sm">
@@ -76,6 +77,7 @@ const Dashboard = () => {
     { id: "Audience", label: "Audience" },
     { id: "Analytics", label: "Analytics" },
     { id: "A/B Testing", label: "A/B Testing" },
+    { id: "Genders", label: "Genders" },
   ];
     return (
     <div className="flex min-h-screen bg-[#f1f5f9] text-[#1e293b]">
@@ -210,8 +212,9 @@ const Dashboard = () => {
           {activeTab === "Settings" && <SettingsModule />}
           {activeTab === "Analytics" && <AnalyticsModule />}
           {activeTab === "A/B Testing" && <ABTestingModule />}
+          {activeTab === "Genders" && <GenderModule />}
 
-          {!["Dashboard","Campaigns","Content","Channels", "Audience","Analytics","Security","Settings", "A/B Testing"].includes(activeTab) && (
+          {!["Dashboard","Campaigns","Content","Channels", "Audience","Analytics","Security","Settings", "A/B Testing", "Genders"].includes(activeTab) && (
             <div className="bg-white p-20 text-center rounded-2xl">
               Module {activeTab} coming soon
             </div>
