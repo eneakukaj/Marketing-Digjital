@@ -8,7 +8,7 @@ const GenderModule = () => {
   const stats = [
     {
       title: "Total Genders",
-      value: "-"
+      value: "3"
     }
   ];
 
